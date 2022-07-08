@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'
 // import the fn for correlation
+import React, { useState, useEffect, useRef } from 'react'
 import calculateCorrelation from "calculate-correlation"
 import io from 'socket.io-client'
 let socket;
@@ -39,18 +39,6 @@ const EyeVote = (props) => {
     // values of the answers
     const answerProp = useRef({ one: "", two: "", three: "" });
 
-    // Labels
-    // x and y coordinates of labels
-    var answerOne_x
-    var answerOne_y
-    var answerTwo_x
-    var answerTwo_y
-    var answerThree_x
-    var answerThree_y
-    var answerOne_rect
-    var answerTwo_rect
-    var answerThree_rect
-
     // x and y coordinates of gaze
     var gaze_x
     var gaze_y
@@ -61,12 +49,6 @@ const EyeVote = (props) => {
     var corAnswerTwo
     var corAnswerThree
     const cor_selected = useRef()
-    var corAnswerOne_x
-    var corAnswerOne_y
-    var corAnswerTwo_x
-    var corAnswerTwo_y
-    var corAnswerThree_x
-    var corAnswerThree_y
 
     //On Load 
     const id = useRef(props.id)
@@ -103,21 +85,24 @@ const EyeVote = (props) => {
         //continuing sending objet position
         setTimeout(function run() {
             // get the x and y coordinates of the labels and assign them
-            answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
-            answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
-            answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
+            let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
+            let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
+            let answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
 
             // calculate the center of Label position
-            answerOne_x = answerOne_rect.left;
-            answerOne_y = answerOne_rect.top;
-            answerTwo_x = answerTwo_rect.left;
-            answerTwo_y = answerTwo_rect.top;
-            answerThree_x = answerThree_rect.left;
-            answerThree_y = answerThree_rect.top;
+
+            // Labels
+            // x and y coordinates of labels
+            let answerOne_x = answerOne_rect.left;
+            let answerOne_y = answerOne_rect.top;
+            let answerTwo_x = answerTwo_rect.left;
+            let answerTwo_y = answerTwo_rect.top;
+            let answerThree_x = answerThree_rect.left;
+            let answerThree_y = answerThree_rect.top;
             const positionObj = { answerOne_x, answerOne_y, answerTwo_x, answerTwo_y, answerThree_x, answerThree_y }
             socket.emit('object-position-change', positionObj)
-            // setTimeout(run, 2000);
-        }, 2000);
+            setTimeout(run, 1000); // To continue sending object postion
+        }, 1000);
     }, [])
 
     const handleAnswerRecived = (msg) => {
@@ -133,6 +118,7 @@ const EyeVote = (props) => {
                     corAnswerOne = 0
                     break;
 
+                case 'answerTwo':
                 case 'answerThree':
                     corAnswerThree = 0
                     nextQuestion()
@@ -140,19 +126,16 @@ const EyeVote = (props) => {
                     break;
             }
 
-            empty()
+            // empty()
             undoscreen.current = false
-            setUndo('0')
-
             // setTimeout(function () {
-            //     setUndo('0')
+            setUndo('0')
             // }, 1000);
 
         } else {
             // Question page
             switch (msg) {
                 case 'answerOne':
-                    console.log('here')
                     answerOne.current = true
                     undoscreen.current = true
                     answerselected.current = answerProp.current.one
@@ -242,49 +225,7 @@ const EyeVote = (props) => {
         Correlation(gaze_x, gaze_y, gaze_time)
     }
 
-    // calculates Correlation
-    function Correlation(gaze_x, gaze_y, gaze_time) {
-        // get the x and y coordinates of the labels and assign them
-        answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
-        answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
-        answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
 
-        // calculate the center of Label position
-        answerOne_x = answerOne_rect.left;
-        answerOne_y = answerOne_rect.top;
-        answerTwo_x = answerTwo_rect.left;
-        answerTwo_y = answerTwo_rect.top;
-        answerThree_x = answerThree_rect.left;
-        answerThree_y = answerThree_rect.top;
-
-        // push label positions into the arrays
-        logLabelPositionOne_x.push(answerOne_x)
-        logLabelPositionOne_y.push(answerOne_y)
-        logLabelPositionTwo_x.push(answerTwo_x)
-        logLabelPositionTwo_y.push(answerTwo_y)
-        logLabelPositionThree_x.push(answerThree_x)
-        logLabelPositionThree_y.push(answerThree_y)
-
-        // push gaze data into the arrays
-        logGazePosition_x.push(gaze_x)
-        logGazePosition_y.push(gaze_y)
-        logGazeTime.push(gaze_time)
-
-        // calculate the correlation
-        corAnswerOne_x = calculateCorrelation(logLabelPositionOne_x, logGazePosition_x);
-        corAnswerOne_y = calculateCorrelation(logLabelPositionOne_y, logGazePosition_y);
-        corAnswerTwo_x = calculateCorrelation(logLabelPositionTwo_x, logGazePosition_x);
-        corAnswerTwo_y = calculateCorrelation(logLabelPositionTwo_y, logGazePosition_y);
-        corAnswerThree_x = calculateCorrelation(logLabelPositionThree_x, logGazePosition_x);
-        corAnswerThree_y = calculateCorrelation(logLabelPositionThree_y, logGazePosition_y);
-
-        // calculate correlation
-        corAnswerOne = corAnswerOne_x + corAnswerOne_y;
-        corAnswerTwo = corAnswerTwo_x + corAnswerTwo_y;
-        corAnswerThree = corAnswerThree_x + corAnswerThree_y;
-
-
-    }
 
     const nextQuestion = () => {
         question.current = question.current + 1
@@ -492,14 +433,11 @@ const EyeVote = (props) => {
     const UndoScreen = (props) => {
         return (
             <div className='Eyevote'>
-
-                <h2 className='question'>
-                    <h1 className='instructions' id="questionPrompt">{props.prompt}</h1>
-                    Do you want to change your answer?</h2>
+                <h1 className='question' id="questionPrompt">{props.prompt}{` Do you want to change your answer?`}</h1>
                 <label className='answerOne' id="answerOne">{props.change}</label>
                 <label className='answerTwo' id="answerTwo"></label>
                 <label className='answerThree' id="answerThree">{props.next}</label>
-            </div>
+            </div >
         );
     }
 

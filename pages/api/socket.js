@@ -16,7 +16,7 @@ const SocketHandler = (req, res) => {
 
       socket.on('object-position-change', msg => {
         socket.broadcast.emit('update-object-position', msg)
-        console.log('gaze',msg)
+        // console.log('gaze',msg)
       })
 
       socket.on('submit-answer', msg => {
