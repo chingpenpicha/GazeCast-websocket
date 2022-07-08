@@ -9,10 +9,13 @@ const SocketHandler = (req, res) => {
     res.socket.server.io = io
 
     io.on('connection', socket => {
-    //   socket.on('input-change', msg => {
-    //     socket.broadcast.emit('update-input', msg)
-    //     console.log('change')
-    //   })
+      socket.on('next-screen', msg => {
+        socket.broadcast.emit('update-screen', msg)
+      })
+
+      socket.on('question-change', msg => {
+        socket.broadcast.emit('update-question', msg)
+      })
 
       socket.on('object-position-change', msg => {
         socket.broadcast.emit('update-object-position', msg)

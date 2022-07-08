@@ -8,6 +8,7 @@ const licenseKey = process.env.SEESO_KEY
 
 const EyeTrack = () => {
   const firstRenderRef = useRef(true);
+  const [question, setQuestion] = useState(-1)
   const [objectPositions, setObjectPositions] = useState({})
   const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
 
@@ -123,6 +124,11 @@ const EyeTrack = () => {
       socket.on('update-object-position', obj => {
         updateObjectPositions(obj)
       })
+
+      socket.on('update-question', msg => {
+        console.log('get', msg)
+        setQuestion(msg)
+      })
     }
 
     const updateObjectPositions = (obj) => {
@@ -155,16 +161,28 @@ const EyeTrack = () => {
   }, [])
 
 
+
   return (
-    <div>
+    <div className='alignCenter'>
       <h1>Gaze object positions</h1>
+      <p>{`current question : ${question}`}</p>
       {`1 = circular, 2 = zigzag, 3= diagonal`}
       {Object.keys(objectPositions).map(key => <h4 key={key}>{`${key} :${objectPositions[key]}`}</h4>)}
       <h4>{`gazeX : ${gazePosition.x}`}</h4>
       <h4>{`gazeY : ${gazePosition.y}`}</h4>
-      <button onClick={() => socket.emit('submit-answer', 'answerOne')}>1</button>
-      <button onClick={() => socket.emit('submit-answer', 'answerTwo')}>2</button>
-      <button onClick={() => socket.emit('submit-answer', 'answerThree')}>3</button>
+      {question > 0 &&
+        <>
+          <button onClick={() => socket.emit('submit-answer', 'answerOne')}>1</button>
+          <button onClick={() => socket.emit('submit-answer', 'answerTwo')}>2</button>
+          <button onClick={() => socket.emit('submit-answer', 'answerThree')}>3</button>
+        </>
+      }
+      {question < 1 && <p><button className='eyevotebutton marginTop' onClick={() => {
+        socket.emit('next-screen', question)
+      }}>
+        NEXT
+      </button>
+      </p>}
     </div>
   )
 }

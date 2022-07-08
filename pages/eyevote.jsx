@@ -1,20 +1,20 @@
 // import the fn for correlation
 import React, { useState, useEffect, useRef } from 'react'
-import calculateCorrelation from "calculate-correlation"
+import Image from 'next/image'
 import io from 'socket.io-client'
 let socket;
 
 const questionArray = {
-    1: { prompt: "Is this your first time participating in an eyetracker study?", one: "Yes", two: "No", three: "I don't remember" },
-    2: { prompt: "Do you prefer working/studying remotely or presence?", one: "Remotely", two: "Presence", three: "I dont mind" },
-    3: { prompt: "Which movie genre do you like the most?", one: "Thriller", two: "Action", three: "Comedy" },
-    4: { prompt: "Which social network do you use most often?", one: "Facebook", two: "Instagram", three: "Twitter" },
-    5: { prompt: "Which beverage would you choose?", one: "Tea", two: "Coffee", three: "Water" },
-    6: { prompt: "Which ice cream flavor would you choose?", one: "Vanilla", two: "Mango", three: "Chocolate" },
-    7: { prompt: "How often do you shop online?", one: "Almost daily", two: "Often", three: "Rarely" },
-    8: { prompt: "Which Superpower would you choose?", one: "Teleportation", two: "Read peoples mind", three: "Invisibility" },
-    9: { prompt: "Where do you like to swim?", one: "Beach", two: "I don't like swimming", three: "Pool" },
-    10: { prompt: "Which chewing gum flavor would you choose?", one: "Peppermint", two: "Bubble Gum", three: "Fruity" }
+    1: { prompt: "1. Is this your first time participating in an eyetracker study?", one: "Yes", two: "No", three: "I don't remember" },
+    2: { prompt: "2. Do you prefer working/studying remotely or presence?", one: "Remotely", two: "Presence", three: "I dont mind" },
+    3: { prompt: "3. Which movie genre do you like the most?", one: "Thriller", two: "Action", three: "Comedy" },
+    4: { prompt: "4. Which social network do you use most often?", one: "Facebook", two: "Instagram", three: "Twitter" },
+    5: { prompt: "5. Which beverage would you choose?", one: "Tea", two: "Coffee", three: "Water" },
+    6: { prompt: "6. Which ice cream flavor would you choose?", one: "Vanilla", two: "Mango", three: "Chocolate" },
+    7: { prompt: "7. How often do you shop online?", one: "Almost daily", two: "Often", three: "Rarely" },
+    8: { prompt: "8. Which Superpower would you choose?", one: "Teleportation", two: "Read peoples mind", three: "Invisibility" },
+    9: { prompt: "9. Where do you like to swim?", one: "Beach", two: "I don't like swimming", three: "Pool" },
+    10: { prompt: "10. Which chewing gum flavor would you choose?", one: "Peppermint", two: "Bubble Gum", three: "Fruity" }
 }
 
 const EyeVote = (props) => {
@@ -75,6 +75,12 @@ const EyeVote = (props) => {
                 console.log('connected')
             })
 
+            socket.on('update-screen', msg => {
+                console.log(msg)
+                nextQuestion()
+                setUndo(msg + 3)
+            })
+
             socket.on('update-answer', msg => {
                 console.log('answer received', msg)
                 handleAnswerRecived(msg)
@@ -85,22 +91,24 @@ const EyeVote = (props) => {
         //continuing sending objet position
         setTimeout(function run() {
             // get the x and y coordinates of the labels and assign them
-            let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
-            let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
-            let answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
+            if (question.current > 0) {
+                let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
+                let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
+                let answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
 
-            // calculate the center of Label position
+                // calculate the center of Label position
 
-            // Labels
-            // x and y coordinates of labels
-            let answerOne_x = answerOne_rect.left;
-            let answerOne_y = answerOne_rect.top;
-            let answerTwo_x = answerTwo_rect.left;
-            let answerTwo_y = answerTwo_rect.top;
-            let answerThree_x = answerThree_rect.left;
-            let answerThree_y = answerThree_rect.top;
-            const positionObj = { answerOne_x, answerOne_y, answerTwo_x, answerTwo_y, answerThree_x, answerThree_y }
-            socket.emit('object-position-change', positionObj)
+                // Labels
+                // x and y coordinates of labels
+                let answerOne_x = answerOne_rect.left;
+                let answerOne_y = answerOne_rect.top;
+                let answerTwo_x = answerTwo_rect.left;
+                let answerTwo_y = answerTwo_rect.top;
+                let answerThree_x = answerThree_rect.left;
+                let answerThree_y = answerThree_rect.top;
+                const positionObj = { answerOne_x, answerOne_y, answerTwo_x, answerTwo_y, answerThree_x, answerThree_y }
+                socket.emit('object-position-change', positionObj)
+            }
             setTimeout(run, 1000); // To continue sending object postion
         }, 1000);
     }, [])
@@ -229,6 +237,7 @@ const EyeVote = (props) => {
 
     const nextQuestion = () => {
         question.current = question.current + 1
+        socket.emit('question-change', question.current)
     }
 
     // useEffect(() => {
@@ -374,13 +383,26 @@ const EyeVote = (props) => {
     // First screen 
     const StartScreen = (props) => {
         return (
-            <div className='Eyevote'>
+            <div className='Eyevote' style={{ overflow: 'scroll' }}>
                 <label className='answerOne' id="answerOne"> </label>
                 <label className='answerTwo' id="answerTwo"> </label>
                 <label className='answerThree' id="answerThree"> </label>
                 <div className="descriptionBox">
                     <h1 className='titleEyeVote'>{props.header}</h1>
-                    <h4 className='instructions marginTop'>The study will start with a calibration.</h4><h4 className='instructions'>Please follow the instructions.</h4>
+                    <h4 className='instructions marginTop'>The study will start with a calibration.</h4>
+                    <h4 className='instructions'>Please use mobile to scan the QR code below.</h4>
+
+                    <div className="boxCenter">
+
+                        <Image
+                            //   loader={myLoader}
+                            src="/qrcode.jpg"
+                            alt="QR code to mobile eye tracker"
+                            width={500}
+                            height={500}
+                        />
+                        <h4 className='instructions'>Please click "NEXT" button on mobile if ready.</h4>
+                    </div>
                     <div className="boxCenter">
                         <button className='eyevotebutton marginTop' onClick={() => {
                             // start(); 
