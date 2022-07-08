@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 // import the fn for correlation
 import calculateCorrelation from "calculate-correlation"
-import io from 'Socket.IO-client'
+import io from 'socket.io-client'
 let socket;
 
 const questionArray = {
