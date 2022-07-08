@@ -1,8 +1,13 @@
 import Head from 'next/head'
 import Image from 'next/image'
+import { useEffect } from 'react'
+// import EasySeeSo from 'seeso/easy-seeso';
+
+// import { TrackingState } from 'seeso'
 import styles from '../styles/Home.module.css'
 
 export default function Home() {
+
   return (
     <div className={styles.container}>
       <Head>
@@ -21,7 +26,7 @@ export default function Home() {
           <code className={styles.code}>pages/index.js</code>
         </p>
 
-        <div className={styles.grid}>
+        <div className={styles.grid} id="output">
           <a href="https://nextjs.org/docs" className={styles.card}>
             <h2>Documentation &rarr;</h2>
             <p>Find in-depth information about Next.js features and API.</p>
