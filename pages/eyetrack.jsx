@@ -4,10 +4,10 @@ import calculateCorrelation from "calculate-correlation"
 import io from 'socket.io-client'
 
 const licenseKey = process.env.SEESO_KEY
+let socket
 
 const EyeTrack = () => {
   const firstRenderRef = useRef(true);
-  const [socket, setSocket] = useState(undefined)
   const [question, setQuestion] = useState(-1)
   const [objectPositions, setObjectPositions] = useState({})
   const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
@@ -116,7 +116,22 @@ const EyeTrack = () => {
 
     const socketInitializer = async () => {
       await fetch('/api/socket');
-      setSocket(io())
+      socket = io()
+
+      if (socket) {
+        socket.on('connect', () => {
+          console.log('connected')
+        })
+
+        socket.on('update-object-position', obj => {
+          updateObjectPositions(obj)
+        })
+
+        socket.on('update-question', msg => {
+          console.log('get', msg)
+          setQuestion(msg)
+        })
+      }
     }
 
     const updateObjectPositions = (obj) => {
@@ -147,24 +162,6 @@ const EyeTrack = () => {
 
     initSeeSo()
   }, [])
-
-  useEffect(() => {
-    if (socket) {
-      socket.on('connect', () => {
-        console.log('connected')
-      })
-
-      socket.on('update-object-position', obj => {
-        updateObjectPositions(obj)
-      })
-
-      socket.on('update-question', msg => {
-        console.log('get', msg)
-        setQuestion(msg)
-      })
-    }
-  }, [socket])
-
 
   return (
     <div className='alignCenter'>

@@ -16,10 +16,12 @@ const questionArray = {
     10: { prompt: "10. Which chewing gum flavor would you choose?", one: "Peppermint", two: "Bubble Gum", three: "Fruity" }
 }
 
+let socket
+
 const EyeVote = (props) => {
     // State to show Question, shows StartScreen on State zero
     const question = useRef(-1)
-    const [socket, setSocket] = useState(undefined);
+    // const [socket, setSocket] = useState(undefined);
 
     // State for Question undo
     const [undo, setUndo] = useState('0')
@@ -62,26 +64,6 @@ const EyeVote = (props) => {
     const logGazePosition_y = [];
     const logGazeTime = [];
 
-    //init socket
-    useEffect(() => {
-        if (socket) {
-            socket.on('connect', () => {
-                console.log('connected')
-            })
-
-            socket.on('update-screen', msg => {
-                console.log(msg)
-                nextQuestion()
-                setUndo(msg + 3)
-            })
-
-            socket.on('update-answer', msg => {
-                console.log('answer received', msg)
-                handleAnswerRecived(msg)
-            })
-        }
-    }, [socket])
-
     useEffect(() => {
         // for dev
         // if (firstRenderRef.current) {
@@ -91,7 +73,23 @@ const EyeVote = (props) => {
         const socketInitializer = async () => {
             console.log('init socket')
             await fetch('/api/socket');
-            setSocket(io())
+            socket = io()
+            if (socket) {
+                socket.on('connect', () => {
+                    console.log('connected')
+                })
+
+                socket.on('update-screen', msg => {
+                    console.log(msg)
+                    nextQuestion()
+                    setUndo(msg + 3)
+                })
+
+                socket.on('update-answer', msg => {
+                    console.log('answer received', msg)
+                    handleAnswerRecived(msg)
+                })
+            }
 
         }
         socketInitializer()
