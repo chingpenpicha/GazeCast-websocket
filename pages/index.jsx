@@ -64,6 +64,7 @@ const EyeVote = (props) => {
 
     //init socket
     useEffect(() => {
+        // for dev
         // if (firstRenderRef.current) {
         //     firstRenderRef.current = false;
         //     return;
