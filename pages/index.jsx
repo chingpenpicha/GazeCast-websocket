@@ -19,7 +19,7 @@ const questionArray = {
 const EyeVote = (props) => {
     // State to show Question, shows StartScreen on State zero
     const question = useRef(-1)
-    let socket;
+    const [socket, setSocket] = useState(undefined);
 
     // State for Question undo
     const [undo, setUndo] = useState('0')
@@ -64,14 +64,7 @@ const EyeVote = (props) => {
 
     //init socket
     useEffect(() => {
-        // for dev
-        // if (firstRenderRef.current) {
-        //     firstRenderRef.current = false;
-        //     return;
-        // }
-        const socketInitializer = async () => {
-            await fetch('/api/socket');
-            socket = io()
+        if (socket) {
             socket.on('connect', () => {
                 console.log('connected')
             })
@@ -86,6 +79,20 @@ const EyeVote = (props) => {
                 console.log('answer received', msg)
                 handleAnswerRecived(msg)
             })
+        }
+    }, [socket])
+
+    useEffect(() => {
+        // for dev
+        // if (firstRenderRef.current) {
+        //     firstRenderRef.current = false;
+        //     return;
+        // }
+        const socketInitializer = async () => {
+            console.log('init socket')
+            await fetch('/api/socket');
+            setSocket(io())
+
         }
         socketInitializer()
 

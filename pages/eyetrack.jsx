@@ -3,11 +3,11 @@ import { useEffect, useState, useRef } from 'react'
 import calculateCorrelation from "calculate-correlation"
 import io from 'socket.io-client'
 
-let socket;
 const licenseKey = process.env.SEESO_KEY
 
 const EyeTrack = () => {
   const firstRenderRef = useRef(true);
+  const [socket, setSocket] = useState(undefined)
   const [question, setQuestion] = useState(-1)
   const [objectPositions, setObjectPositions] = useState({})
   const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
@@ -116,20 +116,7 @@ const EyeTrack = () => {
 
     const socketInitializer = async () => {
       await fetch('/api/socket');
-      socket = io()
-
-      socket.on('connect', () => {
-        console.log('connected')
-      })
-
-      socket.on('update-object-position', obj => {
-        updateObjectPositions(obj)
-      })
-
-      socket.on('update-question', msg => {
-        console.log('get', msg)
-        setQuestion(msg)
-      })
+      setSocket(io())
     }
 
     const updateObjectPositions = (obj) => {
@@ -155,12 +142,28 @@ const EyeTrack = () => {
         seeSo.setFaceDistance(50);
         seeSo.setCameraPosition(window.outerWidth / 2, true);
         seeSo.startTracking(onGaze, onDebug)
-      }, () => { console.log("callback when init failed"); alert('init See So failed') })
+      }, (e) => { console.log(e); alert('init See So failed: CODE', e) })
     }
 
     initSeeSo()
   }, [])
 
+  useEffect(() => {
+    if (socket) {
+      socket.on('connect', () => {
+        console.log('connected')
+      })
+
+      socket.on('update-object-position', obj => {
+        updateObjectPositions(obj)
+      })
+
+      socket.on('update-question', msg => {
+        console.log('get', msg)
+        setQuestion(msg)
+      })
+    }
+  }, [socket])
 
 
   return (
