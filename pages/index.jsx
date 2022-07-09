@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import io from 'socket.io-client'
-let socket;
 
 const questionArray = {
     1: { prompt: "1. Is this your first time participating in an eyetracker study?", one: "Yes", two: "No", three: "I don't remember" },
@@ -20,6 +19,7 @@ const questionArray = {
 const EyeVote = (props) => {
     // State to show Question, shows StartScreen on State zero
     const question = useRef(-1)
+    let socket;
 
     // State for Question undo
     const [undo, setUndo] = useState('0')
@@ -64,10 +64,10 @@ const EyeVote = (props) => {
 
     //init socket
     useEffect(() => {
-        if (firstRenderRef.current) {
-            firstRenderRef.current = false;
-            return;
-        }
+        // if (firstRenderRef.current) {
+        //     firstRenderRef.current = false;
+        //     return;
+        // }
         const socketInitializer = async () => {
             await fetch('/api/socket');
             socket = io()
