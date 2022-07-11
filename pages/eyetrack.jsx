@@ -142,22 +142,22 @@ const EyeTrack = () => {
     socketInitializer()
 
     const initSeeSo = async () => {
-      const EasySeeSo = await import('seeso/easy-seeso')
+      const EasySeeSo = await import('../seeso-minjs/easy-seeso')
       /**
-       * set monitor size.    default: 16 inch.
+       * set monitor size.    default: 13 inch.
        * set face distance.   default: 30 cm.
        * set camera position. default:
        * camera x: right center
        * cameraOnTop: true
        */
       const seeSo = new EasySeeSo.default();
-      // console.log(seeSo)
+      console.log(seeSo)
       await seeSo.init(licenseKey, () => {
-        seeSo.setMonitorSize(16);
-        seeSo.setFaceDistance(50);
+        seeSo.setMonitorSize(20);
+        seeSo.setFaceDistance(30);
         seeSo.setCameraPosition(window.outerWidth / 2, true);
         seeSo.startTracking(onGaze, onDebug)
-      }, (e) => { console.log(e); alert('init See So failed: CODE', e) })
+      }, () => { alert('init SeeSo failed') })
     }
 
     initSeeSo()
