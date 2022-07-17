@@ -45,37 +45,38 @@ const EyeTrack = () => {
       // logGazeTime.push(gaze_time)
 
       // calculate the correlation
-      if (logGazePosition_x.length > 5) {
-        let corAnswerOne_x = calculateCorrelation(logLabelPositionOne_x, logGazePosition_x);
-        let corAnswerOne_y = calculateCorrelation(logLabelPositionOne_y, logGazePosition_y);
-        let corAnswerTwo_x = calculateCorrelation(logLabelPositionTwo_x, logGazePosition_x);
-        let corAnswerTwo_y = calculateCorrelation(logLabelPositionTwo_y, logGazePosition_y);
-        let corAnswerThree_x = calculateCorrelation(logLabelPositionThree_x, logGazePosition_x);
-        let corAnswerThree_y = calculateCorrelation(logLabelPositionThree_y, logGazePosition_y);
+      // if (logGazePosition_x.length > 5) {
+      let corAnswerOne_x = calculateCorrelation(logLabelPositionOne_x, logGazePosition_x);
+      let corAnswerOne_y = calculateCorrelation(logLabelPositionOne_y, logGazePosition_y);
+      let corAnswerTwo_x = calculateCorrelation(logLabelPositionTwo_x, logGazePosition_x);
+      let corAnswerTwo_y = calculateCorrelation(logLabelPositionTwo_y, logGazePosition_y);
+      let corAnswerThree_x = calculateCorrelation(logLabelPositionThree_x, logGazePosition_x);
+      let corAnswerThree_y = calculateCorrelation(logLabelPositionThree_y, logGazePosition_y);
 
-        // calculate correlation
-        let corAnswerOne = corAnswerOne_x + corAnswerOne_y;
-        let corAnswerTwo = corAnswerTwo_x + corAnswerTwo_y;
-        let corAnswerThree = corAnswerThree_x + corAnswerThree_y;
+      // calculate correlation
+      let corAnswerOne = corAnswerOne_x < corAnswerOne_y ? corAnswerOne_x : corAnswerOne_y;
+      let corAnswerTwo = corAnswerTwo_x < corAnswerTwo_y ? corAnswerTwo_x : corAnswerTwo_y;
+      let corAnswerThree = corAnswerThree_x < corAnswerThree_y ? corAnswerThree_x : corAnswerThree_y;
 
-        // console.log('cal results: ', corAnswerOne, corAnswerTwo, corAnswerThree)
+      // console.log('cal results: ', corAnswerOne, corAnswerTwo, corAnswerThree)
 
-        if (((corAnswerOne) >= 1) && (corAnswerOne > corAnswerTwo) && (corAnswerOne > corAnswerThree)) {
-          socket.emit('submit-answer', 'answerOne')
-          empty()
-        } else if (((corAnswerTwo) >= 1) && (corAnswerTwo > corAnswerOne) && (corAnswerTwo > corAnswerThree)) {
-          socket.emit('submit-answer', 'answerTwo')
-          empty()
-        } else if (((corAnswerThree) >= 1) && (corAnswerThree > corAnswerOne) && (corAnswerThree > corAnswerTwo)) {
-          socket.emit('submit-answer', 'answerThree')
-          empty()
-        }
+      if (((corAnswerOne) > 0.7) && (corAnswerOne > corAnswerTwo) && (corAnswerOne > corAnswerThree)) {
+        socket.emit('submit-answer', 'answerOne')
+        empty()
+      } else if (((corAnswerTwo) > 0.7) && (corAnswerTwo > corAnswerOne) && (corAnswerTwo > corAnswerThree)) {
+        socket.emit('submit-answer', 'answerTwo')
+        empty()
+      } else if (((corAnswerThree) > 0.7) && (corAnswerThree > corAnswerOne) && (corAnswerThree > corAnswerTwo)) {
+        socket.emit('submit-answer', 'answerThree')
+        empty()
       }
+      // }
 
       /// clear array
       if (logLabelPositionOne_x.length > 300) {
         empty()
       }
+      console.log(corAnswerOne, corAnswerTwo, corAnswerThree)
     }
   }
 
@@ -96,6 +97,12 @@ const EyeTrack = () => {
     // do something with gaze info.
     // console.log('gazeInfo', gazeInfo.x, gazeInfo.y)
     setGazePosition({ ...gazeInfo })
+    if (!gaze_x) {
+      console.log("X_NAN")
+    }
+    if (!gaze_y) {
+      console.log("Y_NAN")
+    }
     gaze_x = gazeInfo.x
     gaze_y = gazeInfo.y
   }
@@ -153,9 +160,9 @@ const EyeTrack = () => {
       const seeSo = new EasySeeSo.default();
       console.log(seeSo)
       await seeSo.init(licenseKey, () => {
-        seeSo.setMonitorSize(20);
+        seeSo.setMonitorSize(30);
         seeSo.setFaceDistance(30);
-        seeSo.setCameraPosition(window.outerWidth / 2, true);
+        // seeSo.setCameraPosition(window.outerWidth / 2, true);
         seeSo.startTracking(onGaze, onDebug)
       }, () => { alert('init SeeSo failed') })
     }
@@ -178,12 +185,18 @@ const EyeTrack = () => {
           <button onClick={() => socket.emit('submit-answer', 'answerThree')}>3</button>
         </>
       }
-      {question < 1 && <p><button className='eyevotebutton marginTop' onClick={() => {
-        socket.emit('next-screen', question)
-      }}>
-        NEXT
-      </button>
-      </p>}
+      {question < 1 &&
+        <p><button className='eyevotebutton marginTop' onClick={() => {
+          if (question < 1) {
+            socket.emit('next-screen', question)
+          } else {
+            socket.emit('submit-answer', 'answerThree')
+          }
+        }}>
+          NEXT
+        </button>
+        </p>
+      }
     </div>
   )
 }
