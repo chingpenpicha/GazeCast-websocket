@@ -16,6 +16,8 @@ import io from 'socket.io-client'
 //     10: { prompt: "10. Which chewing gum flavor would you choose?", one: "Peppermint", two: "Bubble Gum", three: "Fruity" }
 // }
 
+const WINDOW_SIZE = 2000 // 2 second
+
 const questionArray = {
     1: { prompt: "1. Follow '1'", one: "1", two: "2", three: "3" },
     2: { prompt: "2. Follow '2'", one: "1", two: "2", three: "3" },
@@ -130,8 +132,8 @@ const EyeVote = (props) => {
                 const positionObj = { answerOne_x, answerOne_y, answerTwo_x, answerTwo_y, answerThree_x, answerThree_y }
                 socket.emit('object-position-change', positionObj)
             }
-            setTimeout(run, 1000); // To continue sending object postion
-        }, 1000);
+            setTimeout(run, WINDOW_SIZE); // To continue sending object postion
+        }, WINDOW_SIZE);
     }, [])
 
     const handleAnswerRecived = (msg) => {
