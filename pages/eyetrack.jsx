@@ -164,7 +164,7 @@ const EyeTrack = () => {
       console.log(seeSo)
       await seeSo.init(licenseKey, () => {
         seeSo.setMonitorSize(13);
-        seeSo.setFaceDistance(30);
+        seeSo.setFaceDistance(20);
         // seeSo.setCameraPosition(window.outerWidth / 2, true);
         seeSo.startTracking(onGaze, onDebug)
       }, () => { alert('init SeeSo failed') })
