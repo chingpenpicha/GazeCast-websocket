@@ -5,7 +5,7 @@ import io from 'socket.io-client'
 
 const licenseKey = process.env.SEESO_KEY
 let socket
-const THRESHOLD = 0.7
+const THRESHOLD = 0.9
 
 const EyeTrack = () => {
   const firstRenderRef = useRef(true);
