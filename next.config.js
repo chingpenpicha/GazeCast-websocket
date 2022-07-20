@@ -7,7 +7,7 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/eyetrack',
+        source: '/mobile',
         headers: [
           {
             key: 'Cross-Origin-Embedder-Policy',
@@ -19,8 +19,22 @@ const nextConfig = {
           },
         ],
       },
+      {
+      source: '/webcam',
+      headers: [
+        {
+          key: 'Cross-Origin-Embedder-Policy',
+          value: 'require-corp',
+        },
+        {
+          key: 'Cross-Origin-Opener-Policy',
+          value: 'same-origin',
+        },
+      ],
+    },
     ]
   },
+  
 }
 
 module.exports = nextConfig

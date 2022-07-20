@@ -7,7 +7,7 @@ const licenseKey = process.env.SEESO_KEY
 let socket
 const THRESHOLD = 0.8
 
-const EyeTrack = () => {
+const Webcamera = () => {
   const firstRenderRef = useRef(true);
   const [question, setQuestion] = useState(-1)
   const [objectPositions, setObjectPositions] = useState({})
@@ -201,4 +201,4 @@ const EyeTrack = () => {
   )
 }
 
-export default EyeTrack;
+export default Webcamera;
