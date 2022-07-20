@@ -3,34 +3,37 @@ import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import io from 'socket.io-client'
 
-// const questionArray = {
-//     1: { prompt: "1. Is this your first time participating in an eyetracker study?", one: "Yes", two: "No", three: "I don't remember" },
-//     2: { prompt: "2. Do you prefer working/studying remotely or presence?", one: "Remotely", two: "Presence", three: "I dont mind" },
-//     3: { prompt: "3. Which movie genre do you like the most?", one: "Thriller", two: "Action", three: "Comedy" },
-//     4: { prompt: "4. Which social network do you use most often?", one: "Facebook", two: "Instagram", three: "Twitter" },
-//     5: { prompt: "5. Which beverage would you choose?", one: "Tea", two: "Coffee", three: "Water" },
-//     6: { prompt: "6. Which ice cream flavor would you choose?", one: "Vanilla", two: "Mango", three: "Chocolate" },
-//     7: { prompt: "7. How often do you shop online?", one: "Almost daily", two: "Often", three: "Rarely" },
-//     8: { prompt: "8. Which Superpower would you choose?", one: "Teleportation", two: "Read peoples mind", three: "Invisibility" },
-//     9: { prompt: "9. Where do you like to swim?", one: "Beach", two: "I don't like swimming", three: "Pool" },
-//     10: { prompt: "10. Which chewing gum flavor would you choose?", one: "Peppermint", two: "Bubble Gum", three: "Fruity" }
-// }
+const questionArray = {
+    // 1: { prompt: "1. 1+3 = ?", one: "2", two: "3", three: "4" },
+    // 1: { prompt: "8. Which Superpower would you choose?", one: "Teleportation", two: "Read peoples mind", three: "Invisibility" },
+
+    1: { prompt: "1. Is this your first time participating in an eyetracker study?", one: "Yes", two: "No", three: "I don't remember" },
+    2: { prompt: "2. Do you prefer working/studying remotely or presence?", one: "Remotely", two: "Presence", three: "I dont mind" },
+    3: { prompt: "3. Which movie genre do you like the most?", one: "Thriller", two: "Action", three: "Comedy" },
+    4: { prompt: "4. Which social network do you use most often?", one: "Facebook", two: "Instagram", three: "Twitter" },
+    5: { prompt: "5. Which beverage would you choose?", one: "Tea", two: "Coffee", three: "Water" },
+    6: { prompt: "6. Which ice cream flavor would you choose?", one: "Vanilla", two: "Mango", three: "Chocolate" },
+    7: { prompt: "7. How often do you shop online?", one: "Almost daily", two: "Often", three: "Rarely" },
+    8: { prompt: "8. Which Superpower would you choose?", one: "Teleportation", two: "Read peoples mind", three: "Invisibility" },
+    9: { prompt: "9. Where do you like to swim?", one: "Beach", two: "I don't like swimming", three: "Pool" },
+    10: { prompt: "10. Which chewing gum flavor would you choose?", one: "Peppermint", two: "Bubble Gum", three: "Fruity" }
+}
 
 const WINDOW_SIZE = 2000 // 2 second
 
-const questionArray = {
-    1: { prompt: "1. Follow '1'", one: "1", two: "2", three: "3" },
-    2: { prompt: "2. Follow '2'", one: "1", two: "2", three: "3" },
-    3: { prompt: "3. Follow '3'", one: "1", two: "2", three: "3" },
-    4: { prompt: "4. Follow '2'", one: "1", two: "2", three: "3" },
-    5: { prompt: "5. Follow '3'", one: "1", two: "2", three: "3" },
-    6: { prompt: "6. Follow '1'", one: "1", two: "2", three: "3" },
-    7: { prompt: "7. Follow '3'", one: "1", two: "2", three: "3" },
-    8: { prompt: "8. Follow '1'", one: "1", two: "2", three: "3" },
-    9: { prompt: "9. Follow '2'", one: "1", two: "2", three: "3" },
-    10: { prompt: "10. Follow '1'", one: "1", two: "2", three: "3" },
+// const questionArray = {
+//     1: { prompt: "1. Follow '1'", one: "1", two: "2", three: "3" },
+//     2: { prompt: "2. Follow '2'", one: "1", two: "2", three: "3" },
+//     3: { prompt: "3. Follow '3'", one: "1", two: "2", three: "3" },
+//     4: { prompt: "4. Follow '2'", one: "1", two: "2", three: "3" },
+//     5: { prompt: "5. Follow '3'", one: "1", two: "2", three: "3" },
+//     6: { prompt: "6. Follow '1'", one: "1", two: "2", three: "3" },
+//     7: { prompt: "7. Follow '3'", one: "1", two: "2", three: "3" },
+//     8: { prompt: "8. Follow '1'", one: "1", two: "2", three: "3" },
+//     9: { prompt: "9. Follow '2'", one: "1", two: "2", three: "3" },
+//     10: { prompt: "10. Follow '1'", one: "1", two: "2", three: "3" },
 
-}
+// }
 
 
 let socket
@@ -466,10 +469,20 @@ const EyeVote = (props) => {
         answerProp.current = { one: props.one, two: props.two, three: props.three }
         return (
             <div className='Eyevote'>
+                {/* <h1 className='question' id="questionPrompt">Follow the red number</h1> */}
                 <h1 className='question' id="questionPrompt">{props.prompt}</h1>
                 <label className='answerOne' id="answerOne">{props.one}</label>
                 <label className='answerTwo' id="answerTwo">{props.two}</label>
                 <label className='answerThree' id="answerThree">{props.three}</label>
+                {/*                 
+                <label className='answerOne' id="answerOne">x</label>
+                <label className='answerOne-fix'>{props.one}</label>
+                <label className='answerTwo' id="answerTwo">x</label>
+                <label className='answerTwo-fix'>{props.two}</label>
+
+                <label className='answerThree' id="answerThree">x</label>
+                <label className='answerThree-fix'>{props.three}</label> */}
+
             </div>
         );
     }
@@ -485,6 +498,14 @@ const EyeVote = (props) => {
                     () =>
                         nextQuestion()
                 }> NEXT </button> */}
+                {/* <label className='answerTwo-fix'>Show next question in 10 seconds..</label> */}
+                {/* <button className='eyevotebutton marginTop' onClick={() => {
+                            // start(); 
+                            nextQuestion()
+                            setUndo('2')
+                        }}>
+                            Next Question
+                        </button> */}
                 <label className='answerOne' id="answerOne">{props.change}</label>
                 <label className='answerTwo' id="answerTwo"></label>
                 <label className='answerThree' id="answerThree">{props.next}</label>

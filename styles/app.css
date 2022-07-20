@@ -63,24 +63,28 @@
 
 .answerOne {
     position: absolute;
+    color: blue;
     color: white;
     font-size: 6vh;
     top: 35vh;
     left: 15vw;
     animation: circular 17s linear infinite;
     animation-direction: alternate;
+    /* offset-path: path("M100,0 A100,100 0 1,1 100,200 A100,100 0 1,1 100,0"); */
 }
 
 .answerTwo {
     position: absolute;
+    color: red;
     color: white;
     font-size: 6vh;
-    animation: zigzag 25s linear infinite;
+    animation: zigzag 15s linear infinite;
     animation-direction: alternate;
 }
 
 .answerThree {
     position: absolute;
+    color: green;
     color: white;
     font-size: 6vh;
     animation-name: diagonal;
@@ -88,6 +92,41 @@
     animation-iteration-count: infinite;
     animation-direction: alternate;
     animation-timing-function: linear;
+}
+
+.answerOne-fix {
+    position: absolute;
+    color: blue;
+    font-size: 6vh;
+    top: 35vh;
+    left: 13vw;
+    /* animation: circular 17s linear infinite; */
+    /* animation-direction: alternate; */
+    /* offset-path: path("M100,0 A100,100 0 1,1 100,200 A100,100 0 1,1 100,0"); */
+}
+
+.answerTwo-fix {
+    position: absolute;
+    /* color: red; */
+    color: sandybrown;
+    font-size: 6vh;
+    top: 67vh;
+    left: 65vh;
+    /* animation: zigzag 23s linear infinite; */
+    /* animation-direction: alternate; */
+}
+
+.answerThree-fix {
+    position: absolute;
+    color: green;
+    font-size: 6vh;
+    top: 35vh;
+    left: 96vh;
+    /* animation-name: diagonal; */
+    /* animation-duration: 10s; */
+    /* animation-iteration-count: infinite; */
+    /* animation-direction: alternate; */
+    /* animation-timing-function: linear; */
 }
 
 @keyframes diagonal {
@@ -114,32 +153,32 @@
 
 @keyframes zigzag {
     0% {
-        top: 83vh;
+        top: 80vh;
         left: 69vw
     }
 
     20% {
-        top: 72vh;
+        top: 69vh;
         left: 56vw
     }
 
     40% {
-        top: 83vh;
+        top: 80vh;
         left: 43vw
     }
 
     60% {
-        top: 72vh;
+        top: 69vh;
         left: 30vw
     }
 
     80% {
-        top: 83vh;
+        top: 80vh;
         left: 17vw
     }
 
     100% {
-        top: 72vh;
+        top: 69vh;
         left: 4vw
     }
 }
