@@ -34,8 +34,8 @@ const MobileEyeTrack = () => {
     //if gaze x and gaze y have value
     if (gaze_x && gaze_y) {
       // push gaze data into the arrays
-      logGazePosition_x.push(gaze_x * 4)
-      logGazePosition_y.push(gaze_y * 4)
+      logGazePosition_x.push(gaze_x * 2)
+      logGazePosition_y.push(gaze_y * 2)
       // push label positions into the arrays
       logLabelPositionOne_x.push(answerOne_x)
       logLabelPositionOne_y.push(answerOne_y)
