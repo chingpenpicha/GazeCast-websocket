@@ -63,30 +63,33 @@
 
 .answerOne {
     position: absolute;
-    color: blue;
-    color: white;
-    font-size: 6vh;
-    top: 35vh;
-    left: 15vw;
+    width: 3vh;
+    height: 3vh;
+    background-color: dimgray;
+    border-radius: 3vh;
+    top: 45vh;
+    left: 45vw;
     animation: circular 17s linear infinite;
-    animation-direction: alternate;
-    /* offset-path: path("M100,0 A100,100 0 1,1 100,200 A100,100 0 1,1 100,0"); */
 }
 
 .answerTwo {
     position: absolute;
-    color: red;
-    color: white;
-    font-size: 6vh;
+    width: 3vh;
+    height: 3vh;
+    background-color: dimgray;
+    border-radius: 3vh;
+    top: 35vh;
+    left: 15vw;
     animation: zigzag 15s linear infinite;
     animation-direction: alternate;
 }
 
 .answerThree {
     position: absolute;
-    color: green;
-    color: white;
-    font-size: 6vh;
+    width: 3vh;
+    height: 3vh;
+    background-color: dimgray;
+    border-radius: 3vh;
     animation-name: diagonal;
     animation-duration: 8s;
     animation-iteration-count: infinite;
@@ -94,92 +97,57 @@
     animation-timing-function: linear;
 }
 
-.answerOne-fix {
-    position: absolute;
-    color: blue;
-    font-size: 6vh;
-    top: 35vh;
-    left: 13vw;
-    /* animation: circular 17s linear infinite; */
-    /* animation-direction: alternate; */
-    /* offset-path: path("M100,0 A100,100 0 1,1 100,200 A100,100 0 1,1 100,0"); */
-}
-
-.answerTwo-fix {
-    position: absolute;
-    /* color: red; */
-    color: sandybrown;
-    font-size: 6vh;
-    top: 67vh;
-    left: 65vh;
-    /* animation: zigzag 23s linear infinite; */
-    /* animation-direction: alternate; */
-}
-
-.answerThree-fix {
-    position: absolute;
-    color: green;
-    font-size: 6vh;
-    top: 35vh;
-    left: 96vh;
-    /* animation-name: diagonal; */
-    /* animation-duration: 10s; */
-    /* animation-iteration-count: infinite; */
-    /* animation-direction: alternate; */
-    /* animation-timing-function: linear; */
-}
-
 @keyframes diagonal {
     from {
-        top: 22vh;
-        left: 69vw
+        top: 30vh;
+        left: 60vw
     }
 
     to {
-        top: 55vh;
-        left: 47vw
+        top: 65vh;
+        left: 35vw
     }
 }
 
 @keyframes circular {
     from {
-        transform: rotate(0deg) translateX(11vw) rotate(0deg);
+        transform: rotate(0deg) translateX(12vw) rotate(0deg);
     }
 
     to {
-        transform: rotate(360deg) translateX(11vw) rotate(-360deg);
+        transform: rotate(360deg) translateX(12vw) rotate(-360deg);
     }
 }
 
 @keyframes zigzag {
     0% {
-        top: 80vh;
-        left: 69vw
+        top: 55vh;
+        left: 79vw
     }
 
     20% {
-        top: 69vh;
-        left: 56vw
+        top: 40vh;
+        left: 66vw
     }
 
     40% {
-        top: 80vh;
-        left: 43vw
+        top: 55vh;
+        left: 53vw
     }
 
     60% {
-        top: 69vh;
-        left: 30vw
+        top: 40vh;
+        left: 40vw
     }
 
     80% {
-        top: 80vh;
-        left: 17vw
+        top: 55vh;
+        left: 27vw
     }
 
     100% {
-        top: 69vh;
-        left: 4vw
+        top: 40vh;
+        left: 14vw
     }
 }
 
@@ -202,4 +170,9 @@
     height: 16px;
     background-color: green;
     border-radius: 100%;
+}
+
+.select {
+    z-index: 99;
+    background-color: white
 }
