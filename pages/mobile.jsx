@@ -55,21 +55,18 @@ const EyeTrack = () => {
       let corAnswerThree_y = calculateCorrelation(logLabelPositionThree_y, logGazePosition_y);
 
       // calculate correlation
-      // let corAnswerOne = corAnswerOne_x < corAnswerOne_y ? corAnswerOne_x : corAnswerOne_y;
-      // let corAnswerTwo = corAnswerTwo_x < corAnswerTwo_y ? corAnswerTwo_x : corAnswerTwo_y;
-      // let corAnswerThree = corAnswerThree_x < corAnswerThree_y ? corAnswerThree_x : corAnswerThree_y;
-      let corAnswerOne = corAnswerOne_x + corAnswerOne_y
-      let corAnswerTwo = corAnswerTwo_x + corAnswerTwo_y
-      let corAnswerThree = corAnswerThree_x + corAnswerThree_y
+      let corAnswerOne = corAnswerOne_x < corAnswerOne_y ? corAnswerOne_x : corAnswerOne_y;
+      let corAnswerTwo = corAnswerTwo_x < corAnswerTwo_y ? corAnswerTwo_x : corAnswerTwo_y;
+      let corAnswerThree = corAnswerThree_x < corAnswerThree_y ? corAnswerThree_x : corAnswerThree_y;
       // console.log('cal results: ', corAnswerOne, corAnswerTwo, corAnswerThree)
 
-      if (((corAnswerOne_x) > THRESHOLD) && (corAnswerOne_y > THRESHOLD) && (corAnswerOne > corAnswerTwo) && (corAnswerOne > corAnswerThree)) {
+      if (((corAnswerOne) > THRESHOLD) && (corAnswerOne > corAnswerTwo) && (corAnswerOne > corAnswerThree)) {
         socket.emit('submit-answer', 'answerOne')
         empty()
-      } else if (((corAnswerTwo_x) > THRESHOLD) && (corAnswerTwo_y > THRESHOLD) && (corAnswerTwo > corAnswerOne) && (corAnswerTwo > corAnswerThree)) {
+      } else if (((corAnswerTwo) > THRESHOLD) && (corAnswerTwo > corAnswerOne) && (corAnswerTwo > corAnswerThree)) {
         socket.emit('submit-answer', 'answerTwo')
         empty()
-      } else if (((corAnswerThree_x) > THRESHOLD) && (corAnswerThree_y > THRESHOLD) && (corAnswerThree > corAnswerOne) && (corAnswerThree > corAnswerTwo)) {
+      } else if (((corAnswerThree) > THRESHOLD) && (corAnswerThree > corAnswerOne) && (corAnswerThree > corAnswerTwo)) {
         socket.emit('submit-answer', 'answerThree')
         empty()
       }
