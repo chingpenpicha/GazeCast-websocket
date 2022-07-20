@@ -5,14 +5,14 @@ import io from 'socket.io-client'
 
 const licenseKey = process.env.SEESO_KEY
 let socket
-const THRESHOLD = 0.8
+const THRESHOLD = 0.7
 
 const MobileEyeTrack = () => {
   const firstRenderRef = useRef(true);
   const [question, setQuestion] = useState(-1)
   const [objectPositions, setObjectPositions] = useState({})
   const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
-
+  // const [col_X, setCol_X] = useState()
   let gaze_x
   let gaze_y
   //On Load 
@@ -34,8 +34,8 @@ const MobileEyeTrack = () => {
     //if gaze x and gaze y have value
     if (gaze_x && gaze_y) {
       // push gaze data into the arrays
-      logGazePosition_x.push(gaze_x * 2)
-      logGazePosition_y.push(gaze_y * 2)
+      logGazePosition_x.push(gaze_x * 4)
+      logGazePosition_y.push(gaze_y * 4s)
       // push label positions into the arrays
       logLabelPositionOne_x.push(answerOne_x)
       logLabelPositionOne_y.push(answerOne_y)
