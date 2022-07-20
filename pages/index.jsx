@@ -422,7 +422,7 @@ const EyeVote = (props) => {
 
                         <Image
                             //   loader={myLoader}
-                            src="/qrcode.jpg"
+                            src="/qrcode.png"
                             alt="QR code to mobile eye tracker"
                             width={500}
                             height={500}
