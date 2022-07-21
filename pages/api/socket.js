@@ -23,7 +23,6 @@ const SocketHandler = (req, res) => {
 
       socket.on('send-eyetracker-connection', msg => {
         socket.broadcast.emit('update-eyetracker-connection', msg)
-        console.log(msg)
       })
     })
   }

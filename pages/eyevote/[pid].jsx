@@ -288,18 +288,19 @@ const EyeVote = (props) => {
             setCorAnswerTwo(isNaN(temp_corAnswerTwo) ? corAnswerTwo : temp_corAnswerTwo)
             setCorAnswerThree(isNaN(temp_corAnswerThree) ? corAnswerThree : temp_corAnswerThree)
 
-            if (((temp_corAnswerOne) > THRESHOLD) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
-                handleAnswerRecived('answerOne')
-                empty()
-            } else if (((temp_corAnswerTwo) > THRESHOLD) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
-                handleAnswerRecived('answerTwo')
+            if (corAnswerOne_x > 2) {
+                if (((temp_corAnswerOne) > THRESHOLD) && (temp_corAnswerOne < 1) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
+                    handleAnswerRecived('answerOne')
+                    empty()
+                } else if (((temp_corAnswerTwo) > THRESHOLD) && (temp_corAnswerTwo < 1) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
+                    handleAnswerRecived('answerTwo')
 
-                empty()
-            } else if (((temp_corAnswerThree) > THRESHOLD) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
-                handleAnswerRecived('answerThree')
-                empty()
+                    empty()
+                } else if (((temp_corAnswerThree) > THRESHOLD) && (temp_corAnswerThree < 1) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
+                    handleAnswerRecived('answerThree')
+                    empty()
+                }
             }
-
 
             /// clear array
             if (logLabelPositionOne_x.length > 30) {
@@ -399,9 +400,9 @@ const EyeVote = (props) => {
     const SecondScreen = (props) => {
         return (
             <div className='Eyevote'>
-                <label className='answerOne' id="answerOne"> </label>
+                {/* <label className='answerOne' id="answerOne"> </label>
                 <label className='answerTwo' id="answerTwo"> </label>
-                <label className='answerThree' id="answerThree"> </label>
+                <label className='answerThree' id="answerThree"> </label> */}
                 <div className="descriptionBox">
                     <h1 className='titleEyeVote'>{props.header}</h1>
                     <h4 className='instructions marginTop'>You will be asked 10 questions now.</h4>
@@ -438,9 +439,9 @@ const EyeVote = (props) => {
     const StudyEnd = (props) => {
         return (
             <div className='Eyevote'>
-                <label className='answerOne' id="answerOne"> </label>
+                {/* <label className='answerOne' id="answerOne"> </label>
                 <label className='answerTwo' id="answerTwo"> </label>
-                <label className='answerThree' id="answerThree"> </label>
+                <label className='answerThree' id="answerThree"> </label> */}
                 <div className="descriptionBox">
                     <h4 className='instructions'>You have successfully answered all questions.</h4>
                     <h4 className='instructions'>We will now continue with the accuracy test.</h4>
