@@ -17,14 +17,13 @@ const SocketHandler = (req, res) => {
         socket.broadcast.emit('update-question', msg)
       })
 
-      socket.on('object-position-change', msg => {
-        socket.broadcast.emit('update-object-position', msg)
-        // console.log('gaze',msg)
+      socket.on('gaze-position-change', msg => {
+        socket.broadcast.emit('update-gaze-position', msg)
       })
 
-      socket.on('submit-answer', msg => {
-        socket.broadcast.emit('update-answer', msg)
-        console.log('answer',msg)
+      socket.on('send-eyetracker-connection', msg => {
+        socket.broadcast.emit('update-eyetracker-connection', msg)
+        console.log(msg)
       })
     })
   }
