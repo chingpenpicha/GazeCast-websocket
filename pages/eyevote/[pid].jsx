@@ -113,10 +113,10 @@ const EyeVote = (props) => {
 
     useEffect(() => {
         // for dev
-        if (firstRenderRef.current) {
-            firstRenderRef.current = false;
-            return;
-        }
+        // if (firstRenderRef.current) {
+        //     firstRenderRef.current = false;
+        //     return;
+        // }
         const socketInitializer = async () => {
             console.log('init socket')
             await fetch('/api/socket');
@@ -243,7 +243,7 @@ const EyeVote = (props) => {
     function _calculateCorrelation() {
         // const { answerOne_x, answerOne_y, answerTwo_x, answerTwo_y, answerThree_x, answerThree_y } = obj
         //if gaze x and gaze y have value
-        console.log(gaze_x, gaze_y)
+        console.log('gaze: ', gaze_x, gaze_y)
         if (gaze_x && gaze_y && question.current > 0) {
             let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
             let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();

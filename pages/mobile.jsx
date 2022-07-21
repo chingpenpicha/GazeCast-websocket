@@ -59,10 +59,10 @@ const MobileEyeTrack = () => {
     useEffect(() => {
         // for dev
         // protect double call 
-        if (firstRenderRef.current) {
-            firstRenderRef.current = false;
-            return;
-        }
+        // if (firstRenderRef.current) {
+        //     firstRenderRef.current = false;
+        //     return;
+        // }
 
         const socketInitializer = async () => {
             await fetch('/api/socket');
