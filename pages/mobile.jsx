@@ -10,7 +10,7 @@ const MobileEyeTrack = () => {
     const [question, setQuestion] = useState(-1)
     const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
     const [gazeLog, setGazeLog] = useState({
-        max_x: 0, max_y: 0, min_x: 2000, min_y: 2000
+        max_x: -1000, max_y: -1000, min_x: 2000, min_y: 2000
     })
     let gaze_x
     let gaze_y
@@ -60,8 +60,8 @@ const MobileEyeTrack = () => {
         // for dev
         // protect double call 
         // if (firstRenderRef.current) {
-        //     firstRenderRef.current = false;
-        //     return;
+        //   firstRenderRef.current = false;
+        //   return;
         // }
 
         const socketInitializer = async () => {
@@ -90,6 +90,7 @@ const MobileEyeTrack = () => {
              * cameraOnTop: true
              */
             const seeSo = new EasySeeSo.default();
+            console.log(seeSo)
             await seeSo.init(licenseKey, () => {
                 seeSo.setMonitorSize(13);
                 seeSo.setFaceDistance(20);

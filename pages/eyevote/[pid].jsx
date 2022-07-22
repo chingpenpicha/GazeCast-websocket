@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
+import { db } from '../../firebase';
+import { doc, collection, setDoc, updateDoc, arrayUnion, Timestamp } from "firebase/firestore";
+
 // import the fn for correlation
 import calculateCorrelation from "calculate-correlation"
 
@@ -13,38 +16,43 @@ const WEBCAMERA = 'WEBCAMERA'
 const MOBILE_WITH_HAND = 'MOBILE_WITH_HAND'
 const MOBILE_WITH_STAND = 'MOBILE_WITH_STAND'
 
+const CIRCULAR = "CIRCULAR"
+const ZIGZAG = "ZIGZAG"
+const DIAGONAL = "DIAGONAL"
+const NOT_DETECT = "NOT_DETECT"
+
 const questionArray = [{
-    1: { one: true, },
-    2: { two: true, },
-    3: { three: true },
-    4: { three: true },
-    5: { one: true, },
-    6: { two: true, },
-    7: { two: true, },
-    8: { three: true },
-    9: { one: true },
+    1: CIRCULAR,
+    2: ZIGZAG,
+    3: DIAGONAL,
+    4: DIAGONAL,
+    5: CIRCULAR,
+    6: ZIGZAG,
+    7: ZIGZAG,
+    8: DIAGONAL,
+    9: CIRCULAR,
 },
 {
-    1: { two: true, },
-    2: { three: true, },
-    3: { one: true },
-    4: { one: true },
-    5: { two: true, },
-    6: { three: true, },
-    7: { three: true, },
-    8: { one: true },
-    9: { two: true },
+    1: ZIGZAG,
+    2: DIAGONAL,
+    3: CIRCULAR,
+    4: CIRCULAR,
+    5: ZIGZAG,
+    6: DIAGONAL,
+    7: DIAGONAL,
+    8: CIRCULAR,
+    9: ZIGZAG,
 },
 {
-    1: { three: true, },
-    2: { one: true, },
-    3: { two: true },
-    4: { two: true },
-    5: { three: true, },
-    6: { one: true, },
-    7: { one: true, },
-    8: { two: true },
-    9: { three: true },
+    1: DIAGONAL,
+    2: CIRCULAR,
+    3: ZIGZAG,
+    4: ZIGZAG,
+    5: DIAGONAL,
+    6: CIRCULAR,
+    7: CIRCULAR,
+    8: ZIGZAG,
+    9: DIAGONAL,
 },]
 
 
@@ -54,32 +62,26 @@ const EyeVote = (props) => {
     // State to show Question, shows StartScreen on State zero
     // const [question, setQuestion] = useState(-1)
     const question = useRef(-1)
+    const conditionRef = useRef('')
+    const participantRef = useRef('')
+    const questionSetNo = useRef('')
+
     const [undo, setUndo] = useState(-1)
     const [eyetrackerConnected, setEyetrackerConnected] = useState(false)
 
-    const [gazeObj, setGazeObj] = useState({ gaze_x: 0, gaze_y: 0 })
     const router = useRouter()
     const pid = router.query.pid || ''
-    const idForQuestion = pid.split('_')[1] % 3
 
     // State for Question undo
-    const [condition, setCondition] = useState('0')
+    const [condition, setCondition] = useState('')
 
-    const answerselected = useRef("")
     const logselected_gaze = useRef({})
-    const logselected_label = useRef({})
     const calibrationDone = useRef(false)
     const firstRenderRef = useRef(true);
-
-    // This attribute is set to true if an answer was selected
-    const answerOne = useRef(false)
-    const answerTwo = useRef(false)
-    const answerThree = useRef(false)
 
     // x and y coordinates of gaze
     var gaze_x
     var gaze_y
-    var gaze_time
 
     // correlations of labels
     const cor_selected = useRef()
@@ -98,18 +100,6 @@ const EyeVote = (props) => {
     const logGazePosition_x = [];
     const logGazePosition_y = [];
     const logGazeTime = [];
-
-    const handleShow1 = () => {
-        this.setState({
-            show1: true
-        })
-
-        setTimeout(() => {
-            this.setState({
-                show1: false
-            })
-        }, 2000)
-    }
 
     useEffect(() => {
         // for dev
@@ -150,52 +140,19 @@ const EyeVote = (props) => {
 
     }, [])
 
-    const handleAnswerRecived = async (msg) => {
-        //Undo page
+    const handleAnswerRecived = async (msg, corData) => {
         // Question page
-        switch (msg) {
-            case 'answerOne':
-                answerOne.current = true
-                cor_selected.current = corAnswerOne
-                logselected_gaze.current = { gaze_x: logGazePosition_x, gaze_y: logGazePosition_y, gaze_time: logGazeTime }
-                logselected_label.current = { label_x: logLabelPositionOne_x, label_y: logLabelPositionOne_y, label_time: logGazeTime }
-                logData()
-                // corAnswerOne = 0;
+        logselected_gaze.current = { gaze_x: logGazePosition_x, gaze_y: logGazePosition_y, gaze_time: logGazeTime }
+        cor_selected.current = corData
+        await logSubmitData(msg)
 
-                break;
-
-            case 'answerTwo':
-                answerTwo.current = true;
-                cor_selected.current = corAnswerTwo
-                logselected_gaze.current = { gaze_x: logGazePosition_x, gaze_y: logGazePosition_y, gaze_time: logGazeTime }
-                logselected_label.current = { label_x: logLabelPositionTwo_x, label_y: logLabelPositionTwo_y, label_time: logGazeTime }
-                // corAnswerTwo = 0;
-                logData()
-
-                break;
-
-            case 'answerThree':
-                answerThree.current = true;
-                cor_selected.current = corAnswerThree
-                logselected_gaze.current = { gaze_x: logGazePosition_x, gaze_y: logGazePosition_y, gaze_time: logGazeTime }
-                logselected_label.current = { label_x: logLabelPositionTwo_x, label_y: logLabelPositionTwo_y, label_time: logGazeTime }
-                // corAnswerThree = 0;
-                logData()
-
-                break;
-
-        }
         console.log('question no. ', question.current, ' got : ', msg)
-        await sleep(2000)
+        empty()
         nextQuestion()
-
-        // setTimeout(function () {
-        // }, 1000);
     }
 
     // Conditional Question State control
     const questionNumber = () => {
-        // console.log('queetion no', question)
         if (question.current === 0) {
             return <SecondScreen header="GazeCast" />
         }
@@ -203,7 +160,7 @@ const EyeVote = (props) => {
         //     return <AccuracyTest id={id.current} />
         // }
         else if (question.current > 0 && question.current < 10) {
-            return (QuestionScreen(questionArray[idForQuestion][question.current]));
+            return (QuestionScreen(questionArray[questionSetNo.current][question.current]));
         } else if (question.current >= 10) {
             calibrationDone.current = false
             return (
@@ -216,12 +173,14 @@ const EyeVote = (props) => {
 
     // Function on clicking Start button
     function start() {
-        //add start timestamp
-        // pid
-        // db.collection("studyfiles").doc(id.current).update({
-        //     start_time: firebase.firestore.Timestamp.now()
-        // }
-        // )
+        // add start timestamp
+        if (condition && pid) {
+            const dataRef = doc(db, conditionRef.current, participantRef.current)
+            setDoc(dataRef, {
+                start_time: Timestamp.now(),
+                start_time_UNIX: Timestamp.now().toMillis(),
+            }, { merge: true })
+        }
     }
 
     // Handle Gaze results
@@ -229,21 +188,34 @@ const EyeVote = (props) => {
         gaze_x = result.docX;
         gaze_y = result.docY;
         gaze_time = result.time;
-        Correlation(gaze_x, gaze_y, gaze_time)
+        // Correlation(gaze_x, gaze_y, gaze_time)
     }
 
     const nextQuestion = () => {
         // setQuestion(question + 1)
         question.current = question.current + 1
         socket.emit('question-change', question.current)
+        if (question.current > 0 && question.current < 10) {
+            // const dataRef = doc(db, condition, pid)
+            console.log('in next question [', question.current, ']: ', questionArray[questionSetNo.current][question.current])
+            const dataRef = doc(db, conditionRef.current, participantRef.current)
+            setDoc(dataRef, {
+                question_data: {
+                    [`question_${question.current}`]: {
+                        start_time: Timestamp.now(),
+                        start_time_UNIX: Timestamp.now().toMillis(),
+                        to_select: questionArray[questionSetNo.current][question.current]
+                    },
+                },
+            }, { merge: true })
+        }
         setUndo(question.current)
+
     }
 
     // calculates Correlation
     function _calculateCorrelation() {
-        // const { answerOne_x, answerOne_y, answerTwo_x, answerTwo_y, answerThree_x, answerThree_y } = obj
         //if gaze x and gaze y have value
-        console.log('gaze: ', gaze_x, gaze_y)
         if (gaze_x && gaze_y && question.current > 0) {
             let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
             let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
@@ -268,7 +240,7 @@ const EyeVote = (props) => {
             logLabelPositionTwo_y.push(answerTwo_y)
             logLabelPositionThree_x.push(answerThree_x)
             logLabelPositionThree_y.push(answerThree_y)
-            logGazeTime.push(gaze_time)
+            logGazeTime.push(Timestamp.now())
 
             // calculate the correlation
             let corAnswerOne_x = calculateCorrelation(logLabelPositionOne_x, logGazePosition_x);
@@ -287,49 +259,89 @@ const EyeVote = (props) => {
             setCorAnswerOne(isNaN(temp_corAnswerOne) ? corAnswerOne : temp_corAnswerOne)
             setCorAnswerTwo(isNaN(temp_corAnswerTwo) ? corAnswerTwo : temp_corAnswerTwo)
             setCorAnswerThree(isNaN(temp_corAnswerThree) ? corAnswerThree : temp_corAnswerThree)
+            // if(!isNaN(temp_corAnswerOne) && !isNaN(temp_corAnswerTwo) && !isNaN(temp_corAnswerT) )
+            // console.log(condition, conditionRef.current, 'wefsd', participantRef)
+            if (conditionRef.current && participantRef.current) {
 
-            if (corAnswerOne_x > 2) {
+                const dataRef = doc(db, conditionRef.current, participantRef.current)
+                setDoc(dataRef, {
+                    question_data: {
+                        [`question_${question.current}`]: {
+                            log: arrayUnion({
+                                timestamp: Timestamp.now(),
+                                timestamp_UNIX: Timestamp.now().toMillis(),
+                                gaze_x,
+                                gaze_y,
+                                obj_one_x: answerOne_x,
+                                obj_one_y: answerOne_y,
+                                obj_two_x: answerTwo_x,
+                                obj_two_y: answerTwo_y,
+                                obj_three_x: answerThree_x,
+                                obj_three_y: answerThree_y,
+                                cor_one: temp_corAnswerOne,
+                                cor_two: temp_corAnswerTwo,
+                                cor_three: temp_corAnswerThree,
+                                arr_length: logLabelPositionOne_x.length
+                            })
+                        }
+                    }
+                }, { merge: true });
+            }
+            if (logLabelPositionOne_x.length > 2) {
                 if (((temp_corAnswerOne) > THRESHOLD) && (temp_corAnswerOne < 1) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
-                    handleAnswerRecived('answerOne')
-                    empty()
+                    handleAnswerRecived(CIRCULAR, temp_corAnswerOne)
                 } else if (((temp_corAnswerTwo) > THRESHOLD) && (temp_corAnswerTwo < 1) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
-                    handleAnswerRecived('answerTwo')
-
-                    empty()
+                    handleAnswerRecived(ZIGZAG, temp_corAnswerTwo)
                 } else if (((temp_corAnswerThree) > THRESHOLD) && (temp_corAnswerThree < 1) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
-                    handleAnswerRecived('answerThree')
-                    empty()
+                    handleAnswerRecived(DIAGONAL, temp_corAnswerThree)
                 }
             }
 
+
+
             /// clear array
             if (logLabelPositionOne_x.length > 30) {
-                handleAnswerRecived('Not Detect')
-                empty()
+                handleAnswerRecived(NOT_DETECT, -1)
             }
 
         }
     }
 
     // log data into firestore
-    function logData() {
-        // if (question < 10) {
-        //     db.collection("studyfiles").doc(id.current).set({
-        //         question_data: {
-        //             [`question_${question.current}`]: { answerselected: answerselected.current, gaze: logselected_gaze.current, label: logselected_label.current, correlation: cor_selected.current }
-        //         }
-        //     }, { merge: true })
-        // }
-        // if (question === 10) {
-        //     db.collection("studyfiles").doc(id.current).set({
-        //         question_data: {
-        //             question_10: { number: question.current, answerselected: answerselected.current, gaze: logselected_gaze.current, label: logselected_label.current, correlation: cor_selected.current }
-        //         },
-        //         window_height: window.innerHeight,
-        //         window_width: window.innerWidth,
-        //         end_time: firebase.firestore.Timestamp.now()
-        //     }, { merge: true })
-        // }
+
+    async function logSubmitData(selected_ans) {
+        // const dataRef = doc(db, condition, pid)
+        const dataRef = doc(db, conditionRef.current, participantRef.current)
+        console.log('in log [', question.current, '] :', conditionRef.current, participantRef.current)
+        if (question.current < 9) {
+            await setDoc(dataRef, {
+                question_data: {
+                    [`question_${question.current}`]: {
+                        answerselected: selected_ans,
+                        selected_at_gaze: logselected_gaze.current,
+                        selected_correlation: cor_selected.current,
+                        end_time: Timestamp.now(),
+                        end_time_UNIX: Timestamp.now().toMillis()
+                    }
+                }
+            }, { merge: true })
+        } else if (question.current >= 9) {
+            await setDoc(dataRef, {
+                question_data: {
+                    question_9: {
+                        answerselected: selected_ans,
+                        selected_at_gaze: logselected_gaze.current,
+                        selected_correlation: cor_selected.current,
+                        end_time: Timestamp.now(),
+                        end_time_UNIX: Timestamp.now().toMillis()
+                    }
+                },
+                window_height: window.innerHeight,
+                window_width: window.innerWidth,
+                end_time: Timestamp.now(),
+                end_time_UNIX: Timestamp.now().toMillis()
+            }, { merge: true })
+        }
     }
 
     // empty arrays
@@ -355,14 +367,10 @@ const EyeVote = (props) => {
     const StartScreen = (props) => {
         return (
             <div className='Eyevote' style={{ overflow: 'scroll' }}>
-                {/* <label className='answerOne' id="answerOne"> </label>
-                <label className='answerTwo' id="answerTwo"> </label>
-                <label className='answerThree' id="answerThree"> </label> */}
-
                 <div className="descriptionBox">
                     <h1 className='titleEyeVote'>{props.header}</h1>
                     <h3 className='instructions'>Paricipant id: {pid}</h3>
-                    <p className='question_title white'>Choose Condition</p>
+                    <p className='question_title white'>Choose Condition *</p>
                     <label className='white radio_op'><input type="radio" value={WEBCAMERA} name="condition" checked={condition === WEBCAMERA} onChange={(e) => setCondition(WEBCAMERA)} /> Web camera</label> <p />
                     <label className='white radio_op'><input type="radio" value={MOBILE_WITH_STAND} name="condition" checked={condition === MOBILE_WITH_STAND} onChange={(e) => setCondition(MOBILE_WITH_STAND)} /> Mobile with fixed stand</label><p />
                     <label className='white radio_op'><input type="radio" value={MOBILE_WITH_HAND} name="condition" checked={condition === MOBILE_WITH_HAND} onChange={(e) => setCondition(MOBILE_WITH_HAND)} /> Mobile with hand</label><p />
@@ -385,8 +393,13 @@ const EyeVote = (props) => {
                     <br />
                     <div className="boxCenter">
                         <button className='button' onClick={() => {
-                            // start(); 
-                            nextQuestion()
+                            if (condition) {
+                                conditionRef.current = condition
+                                participantRef.current = pid
+                                questionSetNo.current = pid.split('_')[1] % 3
+                                start();
+                                nextQuestion()
+                            }
                         }}>
                             Next
                         </button>
@@ -400,13 +413,9 @@ const EyeVote = (props) => {
     const SecondScreen = (props) => {
         return (
             <div className='Eyevote'>
-                {/* <label className='answerOne' id="answerOne"> </label>
-                <label className='answerTwo' id="answerTwo"> </label>
-                <label className='answerThree' id="answerThree"> </label> */}
                 <div className="descriptionBox">
                     <h1 className='titleEyeVote'>{props.header}</h1>
-                    <h4 className='instructions marginTop'>You will be asked 10 questions now.</h4>
-                    {/* <h4 className='instructions'>Select an answer by following its movement with your gaze.</h4> */}
+                    <h4 className='instructions'>Follow the circle by following its movement with your gaze.</h4>
                     <h6 className='instructions'>{`Eye-tracker status: `}
                         <span className={eyetrackerConnected ? 'green' : 'red'}>
                             {eyetrackerConnected ? 'Connected' : 'Not Connected'}
@@ -415,7 +424,6 @@ const EyeVote = (props) => {
                     {eyetrackerConnected && <div className="boxCenter">
                         <button className='eyevotebutton marginTop' onClick={() => {
                             nextQuestion(); calibrationDone.current = true;
-                            // start()
                         }}>
                             Start
                         </button>
@@ -426,7 +434,10 @@ const EyeVote = (props) => {
     }
 
     // Question screen
-    const QuestionScreen = ({ one = false, two = false, three = false }) => {
+    const QuestionScreen = (val) => {
+        const one = val === CIRCULAR
+        const two = val === ZIGZAG
+        const three = val === DIAGONAL
         return (
             <div className='Eyevote'>
                 <div className={`answerOne ${one && 'select'}`} id="answerOne" >{(corAnswerOne).toFixed(2)}</div>
@@ -439,13 +450,10 @@ const EyeVote = (props) => {
     const StudyEnd = (props) => {
         return (
             <div className='Eyevote'>
-                {/* <label className='answerOne' id="answerOne"> </label>
-                <label className='answerTwo' id="answerTwo"> </label>
-                <label className='answerThree' id="answerThree"> </label> */}
                 <div className="descriptionBox">
-                    <h4 className='instructions'>You have successfully answered all questions.</h4>
-                    <h4 className='instructions'>We will now continue with the accuracy test.</h4>
-                    <p className='instructions'>Please look at the black center inside the white circles showing up on the screen.</p>
+                    <h4 className='instructions'>You have successfully completed this task.</h4>
+                    {/* <h4 className='instructions'>We will now continue with the accuracy test.</h4> */}
+                    {/* <p className='instructions'>Please look at the black center inside the white circles showing up on the screen.</p> */}
                     <div className="boxCenter">
                         <button className='eyevotebutton marginTop' onClick={() => { nextQuestion(); }}>
                             Okay
