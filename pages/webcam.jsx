@@ -92,8 +92,8 @@ const Webcamera = () => {
       const seeSo = new EasySeeSo.default();
       console.log(seeSo)
       await seeSo.init(licenseKey, () => {
-        seeSo.setMonitorSize(13);
-        seeSo.setFaceDistance(40);
+        seeSo.setMonitorSize(22);
+        seeSo.setFaceDistance(45);
         // seeSo.setCameraPosition(window.outerWidth / 2, true);
         seeSo.startTracking(onGaze, onDebug)
         socket.emit('send-eyetracker-connection', true)

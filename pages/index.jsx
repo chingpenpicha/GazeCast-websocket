@@ -25,20 +25,18 @@ const Home = () => {
                 <p className='question_title'>Participant Id: <span style={{ color: 'red' }}>{idErr}</span></p>
                 <input type="text" pid="pid" value={pid} onChange={(e) => setPid(e.target.value)} />
             </div>
-            <p className="body">First of all, thank you for your interest in my Master Thesis study “Remote Eye-Tracking Studies: challenges and opportunities of conducting eye-tracking studies out of the lab”.</p>
+            <p className="body">First of all, thank you for your interest in my Master Thesis study “GazeCast: Using mobile for eye tracking on public display by Pursuit”.</p>
+            <p className="body">The purpose of this experiment is to evaluate the effectiveness of an eye-tracker provided by a smartphone camera to that of a standard web camera. </p>
+            <p className="body">This study will take approximately 30 minutes.</p>
+            <p className="body">Once the study starts, there will be three primary sections to this study. The task you must complete is to follow the white circle on the screen with your eyes using a different sort of eye-tracker for each section.
+                To be clear, run three tests: one with a camera, one with a phone on a stand, and one with a phone in your hand. I'll record your time spent on the study as well as any screen-based gaze data.</p>
 
-            <p className="body">The aim of this study is to collect eyegaze data from the user to compare the gaze accuracy with a traditional lab study.</p>
-            <p className="body">This study will take approximately 15 minutes.
-            </p>
-            <p className="body">Once the study starts, you will be asked 10 questions and will gaze at the moving answers that you want to select. The questions will only include neutral and personal questions where there is
-                no right or wrong. E.g. “Which ice cream flavor would you choose? Vanilla, Chocolate or Strawberry.” You will be able to undo your answer selection if you want to repeat the question.</p>
-
-            <div className="body">Preperation:
+            <div className="body">
                 <ol className='body' style={{ listStyleType: "decimal" }}>
-                    <li>You need a desktop or a laptop with a webcam. A webcam is needed to track your eyegaze.</li>
-                    <li>Sit in a quiet and bright room.</li>
-                    <li>Please don't have a direct light pointing at the webcam or near your head. This will irritate the eye tracking.</li>
-                    <li>Please set your browser size to fullscreen-mode now. (A very common shortcut is the F11 key or on Mac: Control + Command + F) This helps you to not get distracted by other tabs. </li>
+                    <li>If you have any questions, please ask.</li>
+                    <li>After completing each test, Each section will include a questionnaire that you must complete.</li>
+                    <li>Stay relaxed and remember that the eye-tracker, not you, is being evaluated.</li>
+                    <li>You can brink your eyes or request a break after each section if you like.</li>
                 </ol>
             </div>
             <p className="body">After clicking "Continue", you will be led to the Consent Form first.</p>

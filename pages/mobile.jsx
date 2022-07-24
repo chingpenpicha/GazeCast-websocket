@@ -92,8 +92,8 @@ const MobileEyeTrack = () => {
             const seeSo = new EasySeeSo.default();
             console.log(seeSo)
             await seeSo.init(licenseKey, () => {
-                seeSo.setMonitorSize(13);
-                seeSo.setFaceDistance(20);
+                seeSo.setMonitorSize(22);
+                seeSo.setFaceDistance(25);
                 // seeSo.setCameraPosition(window.outerWidth / 2, true);
                 seeSo.startTracking(onGaze, onDebug)
                 socket.emit('send-eyetracker-connection', true)
