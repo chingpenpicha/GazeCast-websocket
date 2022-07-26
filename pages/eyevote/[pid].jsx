@@ -147,10 +147,17 @@ const EyeVote = (props) => {
                     console.log('connected')
                 })
 
-                // socket.on('update-screen', msg => {
-                //     console.log('update screen', msg)
-                //     nextQuestion()
-                // })
+                socket.on('update-web-question', msg => {
+                    if (msg === -1) {
+                        if (condition) {
+                            conditionRef.current = condition
+                            participantRef.current = pid
+                            // questionSetNo.current = pid.split('_')[1] % 3
+                            start();
+                        }
+                    }
+                    nextQuestion()
+                })
 
                 socket.on('update-gaze-position', obj => {
                     gaze_x = obj.gaze_x
@@ -190,7 +197,7 @@ const EyeVote = (props) => {
         }
         else if (undo === '1') {
             // render the UndoScreen
-            return (UndoScreen({ prompt: "Your answer was " + answerselected.current }));
+            return (UndoScreen({ prompt: answerselected.current }));
         }
         // else if (question.current > 11) {
         //     return <AccuracyTest id={id.current} />
@@ -343,7 +350,7 @@ const EyeVote = (props) => {
                         logData.selected_at_UNIX = Timestamp.now().toMillis()
                         logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                         isChangeAns = true
-                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
+                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE
 
                     } else if (((temp_corAnswerTwo) > THRESHOLD) && (temp_corAnswerTwo < 1) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
                         logData.selected_answer = TWO
@@ -353,7 +360,7 @@ const EyeVote = (props) => {
                         logData.selected_at_UNIX = Timestamp.now().toMillis()
                         logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                         isChangeAns = true
-                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
+                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO
 
                     } else if (((temp_corAnswerThree) > THRESHOLD) && (temp_corAnswerThree < 1) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
                         logData.selected_answer = THREE
@@ -363,7 +370,7 @@ const EyeVote = (props) => {
                         logData.selected_at_UNIX = Timestamp.now().toMillis()
                         logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                         isChangeAns = true
-                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
+                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE
 
                     }
 
@@ -456,29 +463,31 @@ const EyeVote = (props) => {
             <div className='Eyevote' style={{ overflow: 'scroll' }}>
                 <div className="descriptionBox">
                     <h1 className='titleEyeVote'>{props.header}</h1>
-                    <h3 className='instructions'>Paricipant id: {pid}</h3>
-                    <p className='question_title dimgray'>Choose Condition *</p>
+                    {/* <h3 className='instructions'>Paricipant id: {pid}</h3> */}
+                    <p className='question_title dimgray'>There will be one trial round, followed by six rounds of experimentation.</p>
+                    <br />
+                    <p className='question_title dimgray'>Choose Eye-tracker *</p>
                     <label className='dimgray radio_op'><input type="radio" value={WEBCAMERA} name="condition" checked={condition === WEBCAMERA} onChange={(e) => setCondition(WEBCAMERA)} /> Web camera</label> <p />
                     <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_STAND} name="condition" checked={condition === MOBILE_WITH_STAND} onChange={(e) => setCondition(MOBILE_WITH_STAND)} /> Mobile with fixed stand</label><p />
                     <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_HAND} name="condition" checked={condition === MOBILE_WITH_HAND} onChange={(e) => setCondition(MOBILE_WITH_HAND)} /> Mobile with hand</label><p />
                     {/* <h4 className='instructions marginTop'>The study will start with a calibration.</h4> */}
                     {condition !== WEBCAMERA &&
                         <>
-                            <h6 className='instructions'>Please use mobile to scan the QR code below.</h6>
+                            <p className='question_title'>Please use your mobile to scan the QR code below to connect with the screen.</p>
                             <div className="boxCenter">
                                 <Image
                                     //   loader={myLoader}
                                     src="/qrcode.png"
                                     alt="QR code to mobile eye tracker"
-                                    width={400}
-                                    height={400}
+                                    width={300}
+                                    height={300}
                                 />
-                                <h4 className='instructions'>Please click "NEXT" button on mobile if ready.</h4>
+                                <p className='question_title'>Please click "NEXT" button on mobile if ready.</p>
                             </div>
                         </>
                     }
                     <br />
-                    <div className="boxCenter">
+                    {condition === WEBCAMERA && <div className="boxCenter">
                         <button className='button' onClick={() => {
                             if (condition) {
                                 conditionRef.current = condition
@@ -491,6 +500,7 @@ const EyeVote = (props) => {
                             Next
                         </button>
                     </div>
+                    }
                 </div >
             </div >
         );
@@ -502,12 +512,16 @@ const EyeVote = (props) => {
             <div className='Eyevote'>
                 <div className="descriptionBox">
                     <h1 className='titleEyeVote'>{props.header}</h1>
-                    <h4 className='instructions'>Follow the circle by following its movement with your gaze.</h4>
-                    <h6 className='instructions'>{`Eye-tracker status: `}
+
+                    {/* < className='instructions'>Follow the circle by following its movement with your gaze.</h4> */}
+                    <p className='instructions'>Find and follow the <span className='pink'>PINK</span> potato moving on the screen</p>
+
+
+                    <p className='question_title dimgray'>{`Eye-tracker status: `}
                         <span className={eyetrackerConnected ? 'green' : 'red'}>
                             {eyetrackerConnected ? 'Connected' : 'Not Connected'}
                         </span>
-                    </h6>
+                    </p>
                     {eyetrackerConnected && <div className="boxCenter">
                         <button className='eyevotebutton marginTop' onClick={() => {
                             nextQuestion(); calibrationDone.current = true;
@@ -559,8 +573,13 @@ const EyeVote = (props) => {
     const UndoScreen = (props) => {
         return (
             <div className='Eyevote'>
-                <h1 className='question' id="questionPrompt">{props.prompt}</h1>
-                <p> Next task will be show in 5 min </p>
+                <div className="descriptionBox boxCenter">
+                    <h1 className='instructions' id="questionPrompt">
+                        {`You did select a `}
+                        {props.prompt ? <span className='pink'>PINK</span> : <span className='brown'>BROWN</span>} {` potato!`}
+                    </h1>
+                    <p> The next task will be shown in 5 seconds </p>
+                </div>
             </div>
         );
     }

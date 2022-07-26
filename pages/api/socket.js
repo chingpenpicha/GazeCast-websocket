@@ -17,6 +17,10 @@ const SocketHandler = (req, res) => {
         socket.broadcast.emit('update-question', msg)
       })
 
+      socket.on('click-next-question', msg => {
+        socket.broadcast.emit('update-web-question', msg)
+      })
+
       socket.on('gaze-position-change', msg => {
         socket.broadcast.emit('update-gaze-position', msg)
       })

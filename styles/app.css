@@ -314,7 +314,7 @@ ol>li:before {
 }
 
 .green {
-    color: greenyellow;
+    color: green;
 }
 
 .red {
@@ -323,4 +323,8 @@ ol>li:before {
 
 .pink {
     color: palevioletred
+}
+
+.brown {
+    color: chocolate;
 }

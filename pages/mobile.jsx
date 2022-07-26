@@ -56,6 +56,10 @@ const MobileEyeTrack = () => {
         // console.log('BUG', FPS, latency_min, latency_max, latency_avg)
     }
 
+    const sendNext = () => {
+        socket.emit('click-next-question', question + 1)
+    }
+
     useEffect(() => {
         // for dev
         // protect double call 
@@ -114,13 +118,11 @@ const MobileEyeTrack = () => {
 
     }, [])
 
-    if (question > 9) {
+    if (question > 6) {
         return (
             <div className='alignCenter'>
                 <h1>Thank you for participating in the GazeCast experiment</h1>
                 <h1>Now you can close your mobile</h1>
-                <p>X range: {gazeLog.min_x} - {gazeLog.max_x}</p>
-                <p>Y range: {gazeLog.min_y} - {gazeLog.max_y}</p>
             </div>
         )
     }
@@ -130,6 +132,15 @@ const MobileEyeTrack = () => {
         <div className='alignCenter'>
             <h1>Gaze positions</h1>
             <p>{`current question : ${question}`}</p>
+            {question < 0 && <>
+                <h4>
+                    Connected with the display!
+                </h4>
+                <button onClick={sendNext}>Next</button>
+            </>}
+            {(question >= 0 && question <= 6) && <div>
+                Find the <span className='pink'>PINK</span> potato!
+            </div>}
             <h4>{`gazeX : ${gazePosition.x}`}</h4>
             <h4>{`gazeY : ${gazePosition.y}`}</h4>
             <p>X range: {gazeLog.min_x} - {gazeLog.max_x}</p>
