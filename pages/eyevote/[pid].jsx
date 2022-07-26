@@ -57,6 +57,7 @@ const NOT_DETECT = "NOT_DETECT"
 
 const questionArray = [{
     // 1: { prompt: "Find the PINK potatoe!", one: "brown_1", two: "pink", three: "brown_3" },
+    0: { prompt: "Find the PINK potato! (Training)", one: "brown", two: "brown", three: "pink" },
     1: { prompt: "Find the PINK potato!", one: "pink", two: "brown", three: "brown" },
     2: { prompt: "Find the PINK potato!", one: "brown", two: "pink", three: "brown" },
     3: { prompt: "Find the PINK potato!", one: "brown", two: "brown", three: "pink" },
@@ -71,6 +72,7 @@ const questionArray = [{
 3 = DIAGONAL
 */
 const CHOICE_TO_SELECT = [{
+    0: THREE,
     1: ONE,
     2: TWO,
     3: THREE,
@@ -85,12 +87,15 @@ let socket
 const EyeVote = (props) => {
     // State to show Question, shows StartScreen on State zero
     // const [question, setQuestion] = useState(-1)
-    const question = useRef(-1)
+    const question = useRef(-2)
     const conditionRef = useRef('')
+    const undoscreen = useRef(false)
+
     const participantRef = useRef('')
     const questionSetNo = useRef(0)
     const durationPerQuestion = useRef(-1)
     const interactionTime = useRef(-1)
+    const answerselected = useRef("")
 
     const [undo, setUndo] = useState(-1)
     const [eyetrackerConnected, setEyetrackerConnected] = useState(false)
@@ -150,7 +155,7 @@ const EyeVote = (props) => {
                 socket.on('update-gaze-position', obj => {
                     gaze_x = obj.gaze_x
                     gaze_y = obj.gaze_y
-                    if (question.current > 0 && question.current <= 6) {
+                    if (question.current >= 0 && question.current <= 6 && !undoscreen.current) {
                         _calculateCorrelation()
                     }
                 })
@@ -168,22 +173,29 @@ const EyeVote = (props) => {
 
     const handleAnswerRecived = () => {
         // Question page
-        if (question.current === 6) {
-            endExperiment()
-        }
-        empty()
-        nextQuestion()
+        setUndo('1')
+        setTimeout(function () {
+            //console.log("Timeout over")
+            empty()
+            undoscreen.current = false
+            setUndo(0)
+            nextQuestion()
+        }, 5000);
     }
 
     // Conditional Question State control
     const questionNumber = () => {
-        if (question.current === 0) {
+        if (question.current === -1) {
             return <SecondScreen header="GazeCast" />
+        }
+        else if (undo === '1') {
+            // render the UndoScreen
+            return (UndoScreen({ prompt: "Your answer was " + answerselected.current }));
         }
         // else if (question.current > 11) {
         //     return <AccuracyTest id={id.current} />
         // }
-        else if (question.current > 0 && question.current <= 6) {
+        else if (question.current >= 0 && question.current <= 6) {
             return (QuestionScreen(questionArray[questionSetNo.current][question.current]));
         } else if (question.current > 6) {
             calibrationDone.current = false
@@ -232,18 +244,18 @@ const EyeVote = (props) => {
         // setQuestion(question + 1)
         question.current = question.current + 1
         socket.emit('question-change', question.current)
-        if (question.current > 0 && question.current <= 6) {
-            console.log('in next question [', question.current, ']: ', questionArray[questionSetNo.current][question.current])
+        if (question.current >= 0 && question.current <= 6) {
+            console.log('in next question [', question.current, ']: ', CHOICE_TO_SELECT[questionSetNo.current][question.current])
             durationPerQuestion.current = Timestamp.now().toMillis()
         }
-        setUndo(question.current)
+        setUndo(question.current + 100)
 
     }
 
     // calculates Correlation
     function _calculateCorrelation() {
         //if gaze x and gaze y have value
-        if (gaze_x && gaze_y && question.current > 0) {
+        if ((!undoscreen.current) && gaze_x && gaze_y && question.current >= 0) {
             //check change ans
             let isChangeAns = false
 
@@ -285,88 +297,98 @@ const EyeVote = (props) => {
             let temp_corAnswerTwo = corAnswerTwo_x < corAnswerTwo_y ? corAnswerTwo_x : corAnswerTwo_y;
             let temp_corAnswerThree = corAnswerThree_x < corAnswerThree_y ? corAnswerThree_x : corAnswerThree_y;
 
-            console.log(temp_corAnswerOne, temp_corAnswerTwo, temp_corAnswerThree)
-            setCorAnswerOne(isNaN(temp_corAnswerOne) ? corAnswerOne : temp_corAnswerOne)
-            setCorAnswerTwo(isNaN(temp_corAnswerTwo) ? corAnswerTwo : temp_corAnswerTwo)
-            setCorAnswerThree(isNaN(temp_corAnswerThree) ? corAnswerThree : temp_corAnswerThree)
+            if (!(isNaN(temp_corAnswerOne) || isNaN(temp_corAnswerTwo) || isNaN(temp_corAnswerThree))) {
+                console.log(temp_corAnswerOne, temp_corAnswerTwo, temp_corAnswerThree)
+                setCorAnswerOne(isNaN(temp_corAnswerOne) ? corAnswerOne : temp_corAnswerOne)
+                setCorAnswerTwo(isNaN(temp_corAnswerTwo) ? corAnswerTwo : temp_corAnswerTwo)
+                setCorAnswerThree(isNaN(temp_corAnswerThree) ? corAnswerThree : temp_corAnswerThree)
 
-            const dataRef = collection(db, conditionRef.current)
-            const logData = {
-                participantId: participantRef.current,
-                questionNo: question.current,
-                condition: conditionRef.current,
-                gaze_x,
-                gaze_y,
-                timestamp: Timestamp.now(),
-                timestamp_UNIX: Timestamp.now().toMillis(),
-                obj_one_x: answerOne_x,
-                obj_one_y: answerOne_y,
-                obj_two_x: answerTwo_x,
-                obj_two_y: answerTwo_y,
-                obj_three_x: answerThree_x,
-                obj_three_y: answerThree_y,
-                cor_one: temp_corAnswerOne,
-                cor_two: temp_corAnswerTwo,
-                cor_three: temp_corAnswerThree,
-                target_to_select: CHOICE_TO_SELECT[questionSetNo.current][question.current],
-            }
-
-            if (conditionRef.current && participantRef.current) {
-                //log end all questions
-                if (question.current === 6) {
-                    const end_time = Timestamp.now()
-                    logData.end_time = end_time
-                    logData.end_time_UNIX = end_time.toMillis()
-                    logData.interaction_time = end_time.toMillis - interactionTime.current
+                const dataRef = collection(db, conditionRef.current)
+                const logData = {
+                    participantId: participantRef.current,
+                    questionNo: question.current,
+                    condition: conditionRef.current,
+                    gaze_x,
+                    gaze_y,
+                    timestamp: Timestamp.now(),
+                    timestamp_UNIX: Timestamp.now().toMillis(),
+                    obj_one_x: answerOne_x,
+                    obj_one_y: answerOne_y,
+                    obj_two_x: answerTwo_x,
+                    obj_two_y: answerTwo_y,
+                    obj_three_x: answerThree_x,
+                    obj_three_y: answerThree_y,
+                    cor_one: temp_corAnswerOne,
+                    cor_two: temp_corAnswerTwo,
+                    cor_three: temp_corAnswerThree,
+                    mode: question.current === 0 ? "TRAINING" : "REAL",
+                    target_to_select: CHOICE_TO_SELECT[questionSetNo.current][question.current],
                 }
 
-                if (((temp_corAnswerOne) > THRESHOLD) && (temp_corAnswerOne < 1) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
-                    logData.selected_answer = ONE
-                    logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
-                    logData.selected_cor = temp_corAnswerOne
-                    logData.selected_at = Timestamp.now()
-                    logData.selected_at_UNIX = Timestamp.now().toMillis()
-                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
-                    isChangeAns = true
+                if (conditionRef.current && participantRef.current) {
+                    //log end all questions
+                    if (question.current === 6) {
+                        const end_time = Timestamp.now()
+                        logData.end_time = end_time
+                        logData.end_time_UNIX = end_time.toMillis()
+                        logData.interaction_time = end_time.toMillis - interactionTime.current
 
-                } else if (((temp_corAnswerTwo) > THRESHOLD) && (temp_corAnswerTwo < 1) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
-                    logData.selected_answer = TWO
-                    logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'CORRECT' : "WRONG"
-                    logData.selected_cor = temp_corAnswerTwo
-                    logData.selected_at = Timestamp.now()
-                    logData.selected_at_UNIX = Timestamp.now().toMillis()
-                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
-                    isChangeAns = true
+                    }
 
-                } else if (((temp_corAnswerThree) > THRESHOLD) && (temp_corAnswerThree < 1) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
-                    logData.selected_answer = THREE
-                    logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'CORRECT' : "WRONG"
-                    logData.selected_cor = temp_corAnswerThree
-                    logData.selected_at = Timestamp.now()
-                    logData.selected_at_UNIX = Timestamp.now().toMillis()
-                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
-                    isChangeAns = true
+                    if (((temp_corAnswerOne) > THRESHOLD) && (temp_corAnswerOne < 1) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
+                        logData.selected_answer = ONE
+                        logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
+                        logData.selected_cor = temp_corAnswerOne
+                        logData.selected_at = Timestamp.now()
+                        logData.selected_at_UNIX = Timestamp.now().toMillis()
+                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                        isChangeAns = true
+                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
+
+                    } else if (((temp_corAnswerTwo) > THRESHOLD) && (temp_corAnswerTwo < 1) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
+                        logData.selected_answer = TWO
+                        logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'CORRECT' : "WRONG"
+                        logData.selected_cor = temp_corAnswerTwo
+                        logData.selected_at = Timestamp.now()
+                        logData.selected_at_UNIX = Timestamp.now().toMillis()
+                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                        isChangeAns = true
+                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
+
+                    } else if (((temp_corAnswerThree) > THRESHOLD) && (temp_corAnswerThree < 1) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
+                        logData.selected_answer = THREE
+                        logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'CORRECT' : "WRONG"
+                        logData.selected_cor = temp_corAnswerThree
+                        logData.selected_at = Timestamp.now()
+                        logData.selected_at_UNIX = Timestamp.now().toMillis()
+                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                        isChangeAns = true
+                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
+
+                    }
 
                 }
 
+                /// clear array
+                if (logLabelPositionOne_x.length > 30) {
+                    logData.select_status = "TIME_OUT"
+                    logData.select_status = "WRONG"
+                    logData.selected_at = Timestamp.now()
+                    logData.selected_at_UNIX = Timestamp.now().toMillis()
+                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                    isChangeAns = true
+                    answerselected.current = "NOT BE DETECTED"
+
+                }
+
+                // addDoc(dataRef, logData); //TODO: REMOVE THIS
+
+                if (isChangeAns) {
+                    handleAnswerRecived()
+                    undoscreen.current = true
+
+                }
             }
-
-            /// clear array
-            if (logLabelPositionOne_x.length > 30) {
-                logData.select_status = "TIME_OUT"
-                logData.select_status = "WRONG"
-                logData.selected_at = Timestamp.now()
-                logData.selected_at_UNIX = Timestamp.now().toMillis()
-                logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
-                isChangeAns = true
-            }
-
-            addDoc(dataRef, logData);
-
-            if (isChangeAns) {
-                handleAnswerRecived()
-            }
-
         }
     }
 
@@ -538,9 +560,7 @@ const EyeVote = (props) => {
         return (
             <div className='Eyevote'>
                 <h1 className='question' id="questionPrompt">{props.prompt}</h1>
-                <label className='answerOne' id="answerOne">{props.change}</label>
-                <label className='answerTwo' id="answerTwo"></label>
-                <label className='answerThree' id="answerThree">{props.next}</label>
+                <p> Next task will be show in 5 min </p>
             </div>
         );
     }
