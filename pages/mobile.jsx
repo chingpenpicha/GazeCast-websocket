@@ -110,7 +110,7 @@ const MobileEyeTrack = () => {
         setTimeout(function run() {
             // get the x and y coordinates of the labels and assign them
             if (gaze_x && gaze_y) {
-                const gazeObj = { gaze_x, gaze_y, page: 'mobile' }
+                const gazeObj = { gaze_x: gaze_x * 2, gaze_y: gaze_y * 2, page: 'mobile' }
                 socket.emit('gaze-position-change', gazeObj)
             }
             setTimeout(run, WINDOW_SIZE); // To continue sending object postion
