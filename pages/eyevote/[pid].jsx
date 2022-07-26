@@ -57,13 +57,13 @@ const NOT_DETECT = "NOT_DETECT"
 
 const questionArray = [{
     // 1: { prompt: "Find the PINK potatoe!", one: "brown_1", two: "pink", three: "brown_3" },
-    0: { prompt: "Find the PINK potato! (Training)", one: "brown", two: "brown", three: "pink" },
-    1: { prompt: "Find the PINK potato!", one: "pink", two: "brown", three: "brown" },
-    2: { prompt: "Find the PINK potato!", one: "brown", two: "pink", three: "brown" },
-    3: { prompt: "Find the PINK potato!", one: "brown", two: "brown", three: "pink" },
-    4: { prompt: "Find the PINK potato!", one: "brown", two: "pink", three: "brown" },
-    5: { prompt: "Find the PINK potato!", one: "brown", two: "brown", three: "pink" },
-    6: { prompt: "Find the PINK potato!", one: "pink", two: "brown", three: "brown" },
+    0: { prompt: "(Training)", one: "brown", two: "brown", three: "pink" },
+    1: { prompt: "(1)", one: "pink", two: "brown", three: "brown" },
+    2: { prompt: "(2)", one: "brown", two: "pink", three: "brown" },
+    3: { prompt: "(3)", one: "brown", two: "brown", three: "pink" },
+    4: { prompt: "(4)", one: "brown", two: "pink", three: "brown" },
+    5: { prompt: "(5)", one: "brown", two: "brown", three: "pink" },
+    6: { prompt: "(6)", one: "pink", two: "brown", three: "brown" },
 }]
 
 /*
@@ -134,10 +134,10 @@ const EyeVote = (props) => {
 
     useEffect(() => {
         // for dev
-        if (firstRenderRef.current) {
-            firstRenderRef.current = false;
-            return;
-        }
+        // if (firstRenderRef.current) {
+        //     firstRenderRef.current = false;
+        //     return;
+        // }
         const socketInitializer = async () => {
             console.log('init socket')
             await fetch('/api/socket');
@@ -350,7 +350,7 @@ const EyeVote = (props) => {
                         logData.selected_at_UNIX = Timestamp.now().toMillis()
                         logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                         isChangeAns = true
-                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE
+                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'PINK' : 'BROWN'
 
                     } else if (((temp_corAnswerTwo) > THRESHOLD) && (temp_corAnswerTwo < 1) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
                         logData.selected_answer = TWO
@@ -360,7 +360,7 @@ const EyeVote = (props) => {
                         logData.selected_at_UNIX = Timestamp.now().toMillis()
                         logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                         isChangeAns = true
-                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO
+                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'PINK' : 'BROWN'
 
                     } else if (((temp_corAnswerThree) > THRESHOLD) && (temp_corAnswerThree < 1) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
                         logData.selected_answer = THREE
@@ -370,21 +370,21 @@ const EyeVote = (props) => {
                         logData.selected_at_UNIX = Timestamp.now().toMillis()
                         logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                         isChangeAns = true
-                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE
+                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'PINK' : 'BROWN'
 
                     }
 
                 }
 
-                /// clear array
-                if (logLabelPositionOne_x.length > 30) {
+                /// clear array : TIME OUT AFTER 40 seconds
+                if (logLabelPositionOne_x.length > 20) {
                     logData.select_status = "TIME_OUT"
-                    logData.select_status = "WRONG"
+                    logData.select_status = NOT_DETECT
                     logData.selected_at = Timestamp.now()
                     logData.selected_at_UNIX = Timestamp.now().toMillis()
                     logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                     isChangeAns = true
-                    answerselected.current = "NOT BE DETECTED"
+                    answerselected.current = NOT_DETECT
 
                 }
 
@@ -543,7 +543,7 @@ const EyeVote = (props) => {
         const three = props.three === 'pink'
         return (
             <div className='Eyevote'>
-                <h1 className='question' id="questionPrompt">Find the <span className='pink'>PINK</span> potato!</h1>
+                <h1 className='question' id="questionPrompt">Find the <span className='pink'>PINK</span> potato! {props.prompt}</h1>
 
                 <div className={`answerOne`} id="answerOne">
                     <Image
@@ -574,10 +574,17 @@ const EyeVote = (props) => {
         return (
             <div className='Eyevote'>
                 <div className="descriptionBox boxCenter">
-                    <h1 className='instructions' id="questionPrompt">
-                        {`You did select a `}
-                        {props.prompt ? <span className='pink'>PINK</span> : <span className='brown'>BROWN</span>} {` potato!`}
-                    </h1>
+
+                    {NOT_DETECT === props.prompt ?
+                        <h1 className='instructions'>
+                            The movement cannot be detected!
+                        </h1>
+                        : <h1 className='instructions'>
+                            {`You did select a `}
+                            <span className={props.prompt === "PINK" ? 'pink' : 'brown'}>{props.prompt}</span>
+                            {` potato!`}
+                        </h1>}
+
                     <p> The next task will be shown in 5 seconds </p>
                 </div>
             </div>

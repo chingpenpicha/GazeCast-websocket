@@ -59,10 +59,10 @@ const Webcamera = () => {
   useEffect(() => {
     // for dev
     // protect double call 
-    if (firstRenderRef.current) {
-      firstRenderRef.current = false;
-      return;
-    }
+    // if (firstRenderRef.current) {
+    //   firstRenderRef.current = false;
+    //   return;
+    // }
 
     const socketInitializer = async () => {
       await fetch('/api/socket');
@@ -92,7 +92,7 @@ const Webcamera = () => {
       const seeSo = new EasySeeSo.default();
       console.log(seeSo)
       await seeSo.init(licenseKey, () => {
-        seeSo.setMonitorSize(22);
+        seeSo.setMonitorSize(32); //22
         seeSo.setFaceDistance(45);
         // seeSo.setCameraPosition(window.outerWidth / 2, true);
         seeSo.startTracking(onGaze, onDebug)
@@ -119,8 +119,8 @@ const Webcamera = () => {
       <div className='alignCenter'>
         <h1>Thank you for participating in the GazeCast experiment</h1>
         <h1>Now you can close your mobile</h1>
-        {/* <p>X range: {gazeLog.min_x} - {gazeLog.max_x}</p>
-        <p>Y range: {gazeLog.min_y} - {gazeLog.max_y}</p> */}
+        <p>X range: {gazeLog.min_x} - {gazeLog.max_x}</p>
+        <p>Y range: {gazeLog.min_y} - {gazeLog.max_y}</p>
       </div>
     )
   }

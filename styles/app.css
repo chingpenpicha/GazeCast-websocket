@@ -217,7 +217,7 @@ ol>li:before {
     color: white;
     border-radius: 3vh;
     animation-name: diagonal;
-    animation-duration: 8s;
+    animation-duration: 7s;
     animation-iteration-count: infinite;
     animation-direction: alternate;
     animation-timing-function: linear;
@@ -247,32 +247,32 @@ ol>li:before {
 
 @keyframes zigzag {
     0% {
-        top: 83vh;
+        top: 65vh;
         left: 69vw
     }
 
     20% {
-        top: 72vh;
+        top: 50vh;
         left: 56vw
     }
 
     40% {
-        top: 83vh;
+        top: 65vh;
         left: 43vw
     }
 
     60% {
-        top: 72vh;
+        top: 50vh;
         left: 30vw
     }
 
     80% {
-        top: 83vh;
+        top: 65vh;
         left: 17vw
     }
 
     100% {
-        top: 72vh;
+        top: 50vh;
         left: 4vw
     }
 }

@@ -63,10 +63,10 @@ const MobileEyeTrack = () => {
     useEffect(() => {
         // for dev
         // protect double call 
-        if (firstRenderRef.current) {
-            firstRenderRef.current = false;
-            return;
-        }
+        // if (firstRenderRef.current) {
+        //     firstRenderRef.current = false;
+        //     return;
+        // }
 
         const socketInitializer = async () => {
             await fetch('/api/socket');
@@ -96,7 +96,7 @@ const MobileEyeTrack = () => {
             const seeSo = new EasySeeSo.default();
             console.log(seeSo)
             await seeSo.init(licenseKey, () => {
-                seeSo.setMonitorSize(22);
+                seeSo.setMonitorSize(32);
                 seeSo.setFaceDistance(25);
                 // seeSo.setCameraPosition(window.outerWidth / 2, true);
                 seeSo.startTracking(onGaze, onDebug)
@@ -130,17 +130,20 @@ const MobileEyeTrack = () => {
 
     return (
         <div className='alignCenter'>
-            <h1>Gaze positions</h1>
-            <p>{`current question : ${question}`}</p>
+            <h1>Welcome to GazeCast experiment</h1>
             {question < 0 && <>
                 <h4>
                     Connected with the display!
                 </h4>
                 <button onClick={sendNext}>Next</button>
             </>}
-            {(question >= 0 && question <= 6) && <div>
-                Find the <span className='pink'>PINK</span> potato!
-            </div>}
+            {(question >= 0 && question <= 6) && <>
+                <p>{`Current question : ${question}`}</p>
+                <div>
+                    Find the <span className='pink'>PINK</span> potato!
+                </div>
+            </>}
+            <br />
             <h4>{`gazeX : ${gazePosition.x}`}</h4>
             <h4>{`gazeY : ${gazePosition.y}`}</h4>
             <p>X range: {gazeLog.min_x} - {gazeLog.max_x}</p>
