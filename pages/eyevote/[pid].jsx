@@ -388,7 +388,7 @@ const EyeVote = (props) => {
 
                 }
 
-                // addDoc(dataRef, logData); //TODO: REMOVE THIS
+                addDoc(dataRef, logData);
 
                 if (isChangeAns) {
                     handleAnswerRecived()
