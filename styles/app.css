@@ -217,7 +217,7 @@ ol>li:before {
     color: white;
     border-radius: 3vh;
     animation-name: diagonal;
-    animation-duration: 7s;
+    animation-duration: 6s;
     animation-iteration-count: infinite;
     animation-direction: alternate;
     animation-timing-function: linear;
@@ -225,13 +225,13 @@ ol>li:before {
 
 @keyframes diagonal {
     from {
-        top: 22vh;
-        left: 69vw
+        top: 20vh;
+        left: 75vw
     }
 
     to {
-        top: 55vh;
-        left: 47vw
+        top: 50vh;
+        left: 50vw
     }
 }
 
@@ -247,33 +247,33 @@ ol>li:before {
 
 @keyframes zigzag {
     0% {
-        top: 65vh;
-        left: 69vw
+        top: 70vh;
+        left: 75vw
     }
 
     20% {
-        top: 50vh;
-        left: 56vw
+        top: 55vh;
+        left: 62vw
     }
 
     40% {
-        top: 65vh;
-        left: 43vw
+        top: 70vh;
+        left: 47vw
     }
 
     60% {
-        top: 50vh;
-        left: 30vw
+        top: 55vh;
+        left: 36vw
     }
 
     80% {
-        top: 65vh;
-        left: 17vw
+        top: 70vh;
+        left: 23vw
     }
 
     100% {
-        top: 50vh;
-        left: 4vw
+        top: 55vh;
+        left: 10vw
     }
 }
 

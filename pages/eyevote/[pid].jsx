@@ -148,13 +148,13 @@ const EyeVote = (props) => {
                 })
 
                 socket.on('update-web-question', msg => {
-                    if (msg === -1) {
-                        if (condition) {
-                            conditionRef.current = condition
-                            participantRef.current = pid
-                            // questionSetNo.current = pid.split('_')[1] % 3
-                            start();
-                        }
+                    if (msg === -2) {
+                        // if (condition) {
+                        conditionRef.current = condition
+                        participantRef.current = pid
+                        // questionSetNo.current = pid.split('_')[1] % 3
+                        start();
+                        // }
                     }
                     nextQuestion()
                 })
@@ -306,11 +306,11 @@ const EyeVote = (props) => {
 
             if (!(isNaN(temp_corAnswerOne) || isNaN(temp_corAnswerTwo) || isNaN(temp_corAnswerThree))) {
                 console.log(temp_corAnswerOne, temp_corAnswerTwo, temp_corAnswerThree)
+                const dataRef = collection(db, conditionRef.current)
                 setCorAnswerOne(isNaN(temp_corAnswerOne) ? corAnswerOne : temp_corAnswerOne)
                 setCorAnswerTwo(isNaN(temp_corAnswerTwo) ? corAnswerTwo : temp_corAnswerTwo)
                 setCorAnswerThree(isNaN(temp_corAnswerThree) ? corAnswerThree : temp_corAnswerThree)
 
-                const dataRef = collection(db, conditionRef.current)
                 const logData = {
                     participantId: participantRef.current,
                     questionNo: question.current,
