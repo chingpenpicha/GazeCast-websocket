@@ -59,10 +59,10 @@ const Webcamera = () => {
   useEffect(() => {
     // for dev
     // protect double call 
-    // if (firstRenderRef.current) {
-    //   firstRenderRef.current = false;
-    //   return;
-    // }
+    if (firstRenderRef.current) {
+      firstRenderRef.current = false;
+      return;
+    }
 
     const socketInitializer = async () => {
       await fetch('/api/socket');
@@ -114,13 +114,13 @@ const Webcamera = () => {
 
   }, [])
 
-  if (question > 9) {
+  if (question > 6) {
     return (
       <div className='alignCenter'>
         <h1>Thank you for participating in the GazeCast experiment</h1>
         <h1>Now you can close your mobile</h1>
-        <p>X range: {gazeLog.min_x} - {gazeLog.max_x}</p>
-        <p>Y range: {gazeLog.min_y} - {gazeLog.max_y}</p>
+        {/* <p>X range: {gazeLog.min_x} - {gazeLog.max_x}</p>
+        <p>Y range: {gazeLog.min_y} - {gazeLog.max_y}</p> */}
       </div>
     )
   }
@@ -130,6 +130,12 @@ const Webcamera = () => {
     <div className='alignCenter'>
       <h1>Gaze positions</h1>
       <p>{`current question : ${question}`}</p>
+      {question < 1 && <p>
+        Connected with the display!
+      </p>}
+      {(question > 0 && question <= 6) && <div>
+        Find the <span className='pink'>PINK</span> potato!
+      </div>}
       <h4>{`gazeX : ${gazePosition.x}`}</h4>
       <h4>{`gazeY : ${gazePosition.y}`}</h4>
       <p>X range: {gazeLog.min_x} - {gazeLog.max_x}</p>

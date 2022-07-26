@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { db } from '../../firebase';
-import { doc, collection, setDoc, updateDoc, arrayUnion, Timestamp } from "firebase/firestore";
+import { doc, collection, setDoc, addDoc, Timestamp } from "firebase/firestore";
 
 // import the fn for correlation
 import calculateCorrelation from "calculate-correlation"
@@ -16,44 +16,68 @@ const WEBCAMERA = 'WEBCAMERA'
 const MOBILE_WITH_HAND = 'MOBILE_WITH_HAND'
 const MOBILE_WITH_STAND = 'MOBILE_WITH_STAND'
 
-const CIRCULAR = "CIRCULAR"
-const ZIGZAG = "ZIGZAG"
-const DIAGONAL = "DIAGONAL"
+const ONE = "ONE"
+const TWO = "TWO"
+const THREE = "THREE"
 const NOT_DETECT = "NOT_DETECT"
 
+// const questionArray = [{
+//     1: CIRCULAR,
+//     2: ZIGZAG,
+//     3: DIAGONAL,
+//     4: DIAGONAL,
+//     5: CIRCULAR,
+//     6: ZIGZAG,
+//     7: ZIGZAG,
+//     8: DIAGONAL,
+//     9: CIRCULAR,
+// },
+// {
+//     1: ZIGZAG,
+//     2: DIAGONAL,
+//     3: CIRCULAR,
+//     4: CIRCULAR,
+//     5: ZIGZAG,
+//     6: DIAGONAL,
+//     7: DIAGONAL,
+//     8: CIRCULAR,
+//     9: ZIGZAG,
+// },
+// {
+//     1: DIAGONAL,
+//     2: CIRCULAR,
+//     3: ZIGZAG,
+//     4: ZIGZAG,
+//     5: DIAGONAL,
+//     6: CIRCULAR,
+//     7: CIRCULAR,
+//     8: ZIGZAG,
+//     9: DIAGONAL,
+// },]
+
 const questionArray = [{
-    1: CIRCULAR,
-    2: ZIGZAG,
-    3: DIAGONAL,
-    4: DIAGONAL,
-    5: CIRCULAR,
-    6: ZIGZAG,
-    7: ZIGZAG,
-    8: DIAGONAL,
-    9: CIRCULAR,
-},
-{
-    1: ZIGZAG,
-    2: DIAGONAL,
-    3: CIRCULAR,
-    4: CIRCULAR,
-    5: ZIGZAG,
-    6: DIAGONAL,
-    7: DIAGONAL,
-    8: CIRCULAR,
-    9: ZIGZAG,
-},
-{
-    1: DIAGONAL,
-    2: CIRCULAR,
-    3: ZIGZAG,
-    4: ZIGZAG,
-    5: DIAGONAL,
-    6: CIRCULAR,
-    7: CIRCULAR,
-    8: ZIGZAG,
-    9: DIAGONAL,
-},]
+    // 1: { prompt: "Find the PINK potatoe!", one: "brown_1", two: "pink", three: "brown_3" },
+    1: { prompt: "Find the PINK potato!", one: "pink", two: "brown", three: "brown" },
+    2: { prompt: "Find the PINK potato!", one: "brown", two: "pink", three: "brown" },
+    3: { prompt: "Find the PINK potato!", one: "brown", two: "brown", three: "pink" },
+    4: { prompt: "Find the PINK potato!", one: "brown", two: "pink", three: "brown" },
+    5: { prompt: "Find the PINK potato!", one: "brown", two: "brown", three: "pink" },
+    6: { prompt: "Find the PINK potato!", one: "pink", two: "brown", three: "brown" },
+}]
+
+/*
+1 = CIRCULAR
+2 = ZIGZAG
+3 = DIAGONAL
+*/
+const CHOICE_TO_SELECT = [{
+    1: ONE,
+    2: TWO,
+    3: THREE,
+    4: TWO,
+    5: ONE,
+    6: THREE,
+}]
 
 
 let socket
@@ -64,7 +88,9 @@ const EyeVote = (props) => {
     const question = useRef(-1)
     const conditionRef = useRef('')
     const participantRef = useRef('')
-    const questionSetNo = useRef('')
+    const questionSetNo = useRef(0)
+    const durationPerQuestion = useRef(-1)
+    const interactionTime = useRef(-1)
 
     const [undo, setUndo] = useState(-1)
     const [eyetrackerConnected, setEyetrackerConnected] = useState(false)
@@ -73,7 +99,7 @@ const EyeVote = (props) => {
     const pid = router.query.pid || ''
 
     // State for Question undo
-    const [condition, setCondition] = useState('')
+    const [condition, setCondition] = useState(WEBCAMERA)
 
     const logselected_gaze = useRef({})
     const calibrationDone = useRef(false)
@@ -103,10 +129,10 @@ const EyeVote = (props) => {
 
     useEffect(() => {
         // for dev
-        // if (firstRenderRef.current) {
-        //     firstRenderRef.current = false;
-        //     return;
-        // }
+        if (firstRenderRef.current) {
+            firstRenderRef.current = false;
+            return;
+        }
         const socketInitializer = async () => {
             console.log('init socket')
             await fetch('/api/socket');
@@ -116,15 +142,15 @@ const EyeVote = (props) => {
                     console.log('connected')
                 })
 
-                socket.on('update-screen', msg => {
-                    console.log('update screen', msg)
-                    nextQuestion()
-                })
+                // socket.on('update-screen', msg => {
+                //     console.log('update screen', msg)
+                //     nextQuestion()
+                // })
 
                 socket.on('update-gaze-position', obj => {
                     gaze_x = obj.gaze_x
                     gaze_y = obj.gaze_y
-                    if (question.current > 0 && question.current < 10) {
+                    if (question.current > 0 && question.current <= 6) {
                         _calculateCorrelation()
                     }
                 })
@@ -140,13 +166,11 @@ const EyeVote = (props) => {
 
     }, [])
 
-    const handleAnswerRecived = async (msg, corData) => {
+    const handleAnswerRecived = () => {
         // Question page
-        logselected_gaze.current = { gaze_x: logGazePosition_x, gaze_y: logGazePosition_y, gaze_time: logGazeTime }
-        cor_selected.current = corData
-        await logSubmitData(msg)
-
-        console.log('question no. ', question.current, ' got : ', msg)
+        if (question.current === 6) {
+            endExperiment()
+        }
         empty()
         nextQuestion()
     }
@@ -159,9 +183,9 @@ const EyeVote = (props) => {
         // else if (question.current > 11) {
         //     return <AccuracyTest id={id.current} />
         // }
-        else if (question.current > 0 && question.current < 10) {
+        else if (question.current > 0 && question.current <= 6) {
             return (QuestionScreen(questionArray[questionSetNo.current][question.current]));
-        } else if (question.current >= 10) {
+        } else if (question.current > 6) {
             calibrationDone.current = false
             return (
                 <StudyEnd />
@@ -176,38 +200,41 @@ const EyeVote = (props) => {
         // add start timestamp
         if (condition && pid) {
             const dataRef = doc(db, conditionRef.current, participantRef.current)
+            console.log('hi ', conditionRef.current, participantRef.current)
+            const start_time = Timestamp.now()
             setDoc(dataRef, {
-                start_time: Timestamp.now(),
-                start_time_UNIX: Timestamp.now().toMillis(),
+                start_time,
+                timestamp: start_time,
+                start_time_UNIX: start_time.toMillis(),
+                timestamp_UNIX: start_time.toMillis(),
             }, { merge: true })
+            interactionTime.current = start_time.toMillis()
         }
     }
 
-    // Handle Gaze results
-    function PlotGaze(result) {
-        gaze_x = result.docX;
-        gaze_y = result.docY;
-        gaze_time = result.time;
-        // Correlation(gaze_x, gaze_y, gaze_time)
-    }
+    // const endExperiment = () => {
+    //     if (condition && pid) {
+    //         const dataRef = doc(db, conditionRef.current, participantRef.current)
+    //         const end_time = Timestamp.now()
+    //         console.log('end')
+    //         setDoc(dataRef, {
+    //             window_height: window.innerHeight,
+    //             window_width: window.innerWidth,
+    //             end_time,
+    //             end_time_UNIX: end_time.toMillis(),
+    //             interaction_time: end_time.toMillis - interactionTime.current,
+    //         }, { merge: true })
+    //     }
+    // }
+
 
     const nextQuestion = () => {
         // setQuestion(question + 1)
         question.current = question.current + 1
         socket.emit('question-change', question.current)
-        if (question.current > 0 && question.current < 10) {
-            // const dataRef = doc(db, condition, pid)
+        if (question.current > 0 && question.current <= 6) {
             console.log('in next question [', question.current, ']: ', questionArray[questionSetNo.current][question.current])
-            const dataRef = doc(db, conditionRef.current, participantRef.current)
-            setDoc(dataRef, {
-                question_data: {
-                    [`question_${question.current}`]: {
-                        start_time: Timestamp.now(),
-                        start_time_UNIX: Timestamp.now().toMillis(),
-                        to_select: questionArray[questionSetNo.current][question.current]
-                    },
-                },
-            }, { merge: true })
+            durationPerQuestion.current = Timestamp.now().toMillis()
         }
         setUndo(question.current)
 
@@ -217,6 +244,9 @@ const EyeVote = (props) => {
     function _calculateCorrelation() {
         //if gaze x and gaze y have value
         if (gaze_x && gaze_y && question.current > 0) {
+            //check change ans
+            let isChangeAns = false
+
             let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
             let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
             let answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
@@ -259,49 +289,82 @@ const EyeVote = (props) => {
             setCorAnswerOne(isNaN(temp_corAnswerOne) ? corAnswerOne : temp_corAnswerOne)
             setCorAnswerTwo(isNaN(temp_corAnswerTwo) ? corAnswerTwo : temp_corAnswerTwo)
             setCorAnswerThree(isNaN(temp_corAnswerThree) ? corAnswerThree : temp_corAnswerThree)
-            // if(!isNaN(temp_corAnswerOne) && !isNaN(temp_corAnswerTwo) && !isNaN(temp_corAnswerT) )
-            // console.log(condition, conditionRef.current, 'wefsd', participantRef)
+
+            const dataRef = collection(db, conditionRef.current)
+            const logData = {
+                participantId: participantRef.current,
+                questionNo: question.current,
+                condition: conditionRef.current,
+                gaze_x,
+                gaze_y,
+                timestamp: Timestamp.now(),
+                timestamp_UNIX: Timestamp.now().toMillis(),
+                obj_one_x: answerOne_x,
+                obj_one_y: answerOne_y,
+                obj_two_x: answerTwo_x,
+                obj_two_y: answerTwo_y,
+                obj_three_x: answerThree_x,
+                obj_three_y: answerThree_y,
+                cor_one: temp_corAnswerOne,
+                cor_two: temp_corAnswerTwo,
+                cor_three: temp_corAnswerThree,
+                target_to_select: CHOICE_TO_SELECT[questionSetNo.current][question.current],
+            }
+
             if (conditionRef.current && participantRef.current) {
-
-                const dataRef = doc(db, conditionRef.current, participantRef.current)
-                setDoc(dataRef, {
-                    question_data: {
-                        [`question_${question.current}`]: {
-                            log: arrayUnion({
-                                timestamp: Timestamp.now(),
-                                timestamp_UNIX: Timestamp.now().toMillis(),
-                                gaze_x,
-                                gaze_y,
-                                obj_one_x: answerOne_x,
-                                obj_one_y: answerOne_y,
-                                obj_two_x: answerTwo_x,
-                                obj_two_y: answerTwo_y,
-                                obj_three_x: answerThree_x,
-                                obj_three_y: answerThree_y,
-                                cor_one: temp_corAnswerOne,
-                                cor_two: temp_corAnswerTwo,
-                                cor_three: temp_corAnswerThree,
-                                arr_length: logLabelPositionOne_x.length
-                            })
-                        }
-                    }
-                }, { merge: true });
-            }
-            if (logLabelPositionOne_x.length > 2) {
-                if (((temp_corAnswerOne) > THRESHOLD) && (temp_corAnswerOne < 1) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
-                    handleAnswerRecived(CIRCULAR, temp_corAnswerOne)
-                } else if (((temp_corAnswerTwo) > THRESHOLD) && (temp_corAnswerTwo < 1) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
-                    handleAnswerRecived(ZIGZAG, temp_corAnswerTwo)
-                } else if (((temp_corAnswerThree) > THRESHOLD) && (temp_corAnswerThree < 1) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
-                    handleAnswerRecived(DIAGONAL, temp_corAnswerThree)
+                //log end all questions
+                if (question.current === 6) {
+                    const end_time = Timestamp.now()
+                    logData.end_time = end_time
+                    logData.end_time_UNIX = end_time.toMillis()
+                    logData.interaction_time = end_time.toMillis - interactionTime.current
                 }
+
+                if (((temp_corAnswerOne) > THRESHOLD) && (temp_corAnswerOne < 1) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
+                    logData.selected_answer = ONE
+                    logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
+                    logData.selected_cor = temp_corAnswerOne
+                    logData.selected_at = Timestamp.now()
+                    logData.selected_at_UNIX = Timestamp.now().toMillis()
+                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                    isChangeAns = true
+
+                } else if (((temp_corAnswerTwo) > THRESHOLD) && (temp_corAnswerTwo < 1) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
+                    logData.selected_answer = TWO
+                    logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'CORRECT' : "WRONG"
+                    logData.selected_cor = temp_corAnswerTwo
+                    logData.selected_at = Timestamp.now()
+                    logData.selected_at_UNIX = Timestamp.now().toMillis()
+                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                    isChangeAns = true
+
+                } else if (((temp_corAnswerThree) > THRESHOLD) && (temp_corAnswerThree < 1) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
+                    logData.selected_answer = THREE
+                    logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'CORRECT' : "WRONG"
+                    logData.selected_cor = temp_corAnswerThree
+                    logData.selected_at = Timestamp.now()
+                    logData.selected_at_UNIX = Timestamp.now().toMillis()
+                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                    isChangeAns = true
+
+                }
+
             }
-
-
 
             /// clear array
             if (logLabelPositionOne_x.length > 30) {
-                handleAnswerRecived(NOT_DETECT, -1)
+                logData.select_status = "TIME_OUT"
+                logData.select_status = "WRONG"
+                logData.selected_at = Timestamp.now()
+                logData.selected_at_UNIX = Timestamp.now().toMillis()
+                logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                isChangeAns = true
+            }
+
+            addDoc(dataRef, logData);
+
+            if (isChangeAns) {
+                handleAnswerRecived()
             }
 
         }
@@ -309,40 +372,42 @@ const EyeVote = (props) => {
 
     // log data into firestore
 
-    async function logSubmitData(selected_ans) {
-        // const dataRef = doc(db, condition, pid)
-        const dataRef = doc(db, conditionRef.current, participantRef.current)
-        console.log('in log [', question.current, '] :', conditionRef.current, participantRef.current)
-        if (question.current < 9) {
-            await setDoc(dataRef, {
-                question_data: {
-                    [`question_${question.current}`]: {
-                        answerselected: selected_ans,
-                        selected_at_gaze: logselected_gaze.current,
-                        selected_correlation: cor_selected.current,
-                        end_time: Timestamp.now(),
-                        end_time_UNIX: Timestamp.now().toMillis()
-                    }
-                }
-            }, { merge: true })
-        } else if (question.current >= 9) {
-            await setDoc(dataRef, {
-                question_data: {
-                    question_9: {
-                        answerselected: selected_ans,
-                        selected_at_gaze: logselected_gaze.current,
-                        selected_correlation: cor_selected.current,
-                        end_time: Timestamp.now(),
-                        end_time_UNIX: Timestamp.now().toMillis()
-                    }
-                },
-                window_height: window.innerHeight,
-                window_width: window.innerWidth,
-                end_time: Timestamp.now(),
-                end_time_UNIX: Timestamp.now().toMillis()
-            }, { merge: true })
-        }
-    }
+    // async function logSubmitData(selected_ans) {
+    //     // const dataRef = doc(db, condition, pid)
+    //     console.log('in log [', question.current, '] :', conditionRef.current, participantRef.current)
+    //     if (question.current < 6) {
+    //         const dataRef = doc(db, conditionRef.current)
+    //         // await setDoc(dataRef, {
+    //         //     question_data: {
+    //         //         [`question_${question.current}`]: {
+    //         //             answerselected: selected_ans,
+    //         //             selected_at_gaze: logselected_gaze.current,
+    //         //             selected_correlation: cor_selected.current,
+    //         //             end_time: Timestamp.now(),
+    //         //             end_time_UNIX: Timestamp.now().toMillis()
+    //         //         }
+    //         //     }
+    //         // }, { merge: true })
+    //         await addDoc(dataRef, {
+    //             participantId: participantRef.current,
+    //             questionNo: question.current,
+    //             condition: conditionRef.current,
+    //             gaze_x,
+    //             gaze_y,
+    //             timestamp: Timestamp.now(),
+    //             timestamp_UNIX: Timestamp.now().toMillis(),
+    //             obj_one_x: answerOne_x,
+    //             obj_one_y: answerOne_y,
+    //             obj_two_x: answerTwo_x,
+    //             obj_two_y: answerTwo_y,
+    //             obj_three_x: answerThree_x,
+    //             obj_three_y: answerThree_y,
+    //             cor_one: temp_corAnswerOne,
+    //             cor_two: temp_corAnswerTwo,
+    //             cor_three: temp_corAnswerThree,
+    //         });
+    //     } else 
+    // }
 
     // empty arrays
     function empty() {
@@ -370,12 +435,12 @@ const EyeVote = (props) => {
                 <div className="descriptionBox">
                     <h1 className='titleEyeVote'>{props.header}</h1>
                     <h3 className='instructions'>Paricipant id: {pid}</h3>
-                    <p className='question_title white'>Choose Condition *</p>
-                    <label className='white radio_op'><input type="radio" value={WEBCAMERA} name="condition" checked={condition === WEBCAMERA} onChange={(e) => setCondition(WEBCAMERA)} /> Web camera</label> <p />
-                    <label className='white radio_op'><input type="radio" value={MOBILE_WITH_STAND} name="condition" checked={condition === MOBILE_WITH_STAND} onChange={(e) => setCondition(MOBILE_WITH_STAND)} /> Mobile with fixed stand</label><p />
-                    <label className='white radio_op'><input type="radio" value={MOBILE_WITH_HAND} name="condition" checked={condition === MOBILE_WITH_HAND} onChange={(e) => setCondition(MOBILE_WITH_HAND)} /> Mobile with hand</label><p />
+                    <p className='question_title dimgray'>Choose Condition *</p>
+                    <label className='dimgray radio_op'><input type="radio" value={WEBCAMERA} name="condition" checked={condition === WEBCAMERA} onChange={(e) => setCondition(WEBCAMERA)} /> Web camera</label> <p />
+                    <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_STAND} name="condition" checked={condition === MOBILE_WITH_STAND} onChange={(e) => setCondition(MOBILE_WITH_STAND)} /> Mobile with fixed stand</label><p />
+                    <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_HAND} name="condition" checked={condition === MOBILE_WITH_HAND} onChange={(e) => setCondition(MOBILE_WITH_HAND)} /> Mobile with hand</label><p />
                     {/* <h4 className='instructions marginTop'>The study will start with a calibration.</h4> */}
-                    {!WEBCAMERA &&
+                    {condition !== WEBCAMERA &&
                         <>
                             <h6 className='instructions'>Please use mobile to scan the QR code below.</h6>
                             <div className="boxCenter">
@@ -396,7 +461,7 @@ const EyeVote = (props) => {
                             if (condition) {
                                 conditionRef.current = condition
                                 participantRef.current = pid
-                                questionSetNo.current = pid.split('_')[1] % 3
+                                // questionSetNo.current = pid.split('_')[1] % 3
                                 start();
                                 nextQuestion()
                             }
@@ -434,15 +499,48 @@ const EyeVote = (props) => {
     }
 
     // Question screen
-    const QuestionScreen = (val) => {
-        const one = val === CIRCULAR
-        const two = val === ZIGZAG
-        const three = val === DIAGONAL
+    const QuestionScreen = (props) => {
+        // answerProp.current = { one: props.one, two: props.two, three: props.three }
+
+        const one = props.one === 'pink'
+        const two = props.two === 'pink'
+        const three = props.three === 'pink'
         return (
             <div className='Eyevote'>
-                <div className={`answerOne ${one && 'select'}`} id="answerOne" >{(corAnswerOne).toFixed(2)}</div>
-                <div className={`answerTwo ${two && 'select'}`} id="answerTwo" >{(corAnswerTwo).toFixed(2)}</div>
-                <div className={`answerThree ${three && 'select'}`} id="answerThree" >{(corAnswerThree).toFixed(2)}</div>
+                <h1 className='question' id="questionPrompt">Find the <span className='pink'>PINK</span> potato!</h1>
+
+                <div className={`answerOne`} id="answerOne">
+                    <Image
+                        src={one ? `/pink_${question.current}.png` : '/brown_1.png'}
+                        alt="Answer 1"
+                        width={70}
+                        height={70}
+                    /></div>
+                <div className={`answerTwo`} id="answerTwo" >
+                    <Image
+                        src={two ? `/pink_${question.current}.png` : '/brown_2.png'}
+                        alt="Answer 2"
+                        width={70}
+                        height={70}
+                    /></div>
+                <div className={`answerThree`} id="answerThree" >
+                    <Image
+                        src={three ? `/pink_${question.current}.png` : '/brown_3.png'}
+                        alt="Answer 3"
+                        width={70}
+                        height={70}
+                    /></div>
+            </div >
+        );
+    }
+
+    const UndoScreen = (props) => {
+        return (
+            <div className='Eyevote'>
+                <h1 className='question' id="questionPrompt">{props.prompt}</h1>
+                <label className='answerOne' id="answerOne">{props.change}</label>
+                <label className='answerTwo' id="answerTwo"></label>
+                <label className='answerThree' id="answerThree">{props.next}</label>
             </div>
         );
     }

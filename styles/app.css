@@ -119,8 +119,9 @@ ol>li:before {
 }
 
 .Eyevote {
-    background: dimgray;
+    background: #fef5ec;
     font-family: "Microsoft Sans Serif";
+    color: dimgray;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
@@ -137,7 +138,7 @@ ol>li:before {
 
 .header {
     position: relative;
-    color: white;
+    color: dimgray;
     font-size: 6vh;
     text-align: center;
     top: 20vh;
@@ -145,7 +146,7 @@ ol>li:before {
 
 .titleEyeVote {
     position: relative;
-    color: white;
+    color: dimgray;
     font-size: 6vh;
     text-align: center;
 }
@@ -161,14 +162,14 @@ ol>li:before {
 
 .instructions {
     position: relative;
-    color: white;
+    color: dimgray;
     text-align: center;
     font-size: 3.5vh;
     width: 100%;
 }
 
 .question {
-    color: white;
+    color: dimgray;
     font-size: 6vh;
     width: 100%;
     top: 50px;
@@ -179,26 +180,26 @@ ol>li:before {
 
 .answerOne {
     position: absolute;
-    width: 3vh;
-    height: 3vh;
+    /* width: 6vh; */
+    /* height: 6vh; */
     text-align: center;
     line-height: 2;
-    background-color: dimgray;
-    color: dimgray;
+    /* background-color: white; */
+    color: white;
     border-radius: 3vh;
-    top: 45vh;
-    left: 45vw;
+    top: 35vh;
+    left: 15vw;
     animation: circular 17s linear infinite;
 }
 
 .answerTwo {
     position: absolute;
-    width: 3vh;
-    height: 3vh;
+    /* width: 6vh; */
+    /* height: 6vh; */
     text-align: center;
     line-height: 2;
-    background-color: dimgray;
-    color: dimgray;
+    /* background-color: white; */
+    color: white;
     border-radius: 3vh;
     top: 35vh;
     left: 15vw;
@@ -208,12 +209,12 @@ ol>li:before {
 
 .answerThree {
     position: absolute;
-    width: 3vh;
-    height: 3vh;
+    /* width: 6vh; */
+    /* height: 6vh; */
     text-align: center;
     line-height: 2;
-    background-color: dimgray;
-    color: dimgray;
+    /* background-color: white; */
+    color: white;
     border-radius: 3vh;
     animation-name: diagonal;
     animation-duration: 8s;
@@ -224,57 +225,58 @@ ol>li:before {
 
 @keyframes diagonal {
     from {
-        top: 30vh;
-        left: 60vw
+        top: 22vh;
+        left: 69vw
     }
 
     to {
-        top: 65vh;
-        left: 35vw
+        top: 55vh;
+        left: 47vw
     }
 }
 
 @keyframes circular {
     from {
-        transform: rotate(0deg) translateX(12vw) rotate(0deg);
+        transform: rotate(0deg) translateX(11vw) rotate(0deg);
     }
 
     to {
-        transform: rotate(360deg) translateX(12vw) rotate(-360deg);
+        transform: rotate(360deg) translateX(11vw) rotate(-360deg);
     }
 }
 
 @keyframes zigzag {
     0% {
-        top: 55vh;
-        left: 79vw
+        top: 83vh;
+        left: 69vw
     }
 
     20% {
-        top: 40vh;
-        left: 66vw
+        top: 72vh;
+        left: 56vw
     }
 
     40% {
-        top: 55vh;
-        left: 53vw
+        top: 83vh;
+        left: 43vw
     }
 
     60% {
-        top: 40vh;
-        left: 40vw
+        top: 72vh;
+        left: 30vw
     }
 
     80% {
-        top: 55vh;
-        left: 27vw
+        top: 83vh;
+        left: 17vw
     }
 
     100% {
-        top: 40vh;
-        left: 14vw
+        top: 72vh;
+        left: 4vw
     }
 }
+
 
 .eyevotebutton {
     position: relative;
@@ -299,12 +301,12 @@ ol>li:before {
 
 .select {
     z-index: 99;
-    background-color: white;
-    color: red;
+    background-color: red;
+    color: white;
 }
 
-.white {
-    color: white;
+.dimgray {
+    color: dimgray;
 }
 
 .radio_op {
@@ -317,4 +319,8 @@ ol>li:before {
 
 .red {
     color: salmon;
+}
+
+.pink {
+    color: palevioletred
 }
