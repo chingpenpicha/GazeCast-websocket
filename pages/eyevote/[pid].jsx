@@ -10,7 +10,7 @@ import io from 'socket.io-client'
 import { useRouter } from 'next/router'
 
 const WINDOW_SIZE = 2000 // 2 second
-const THRESHOLD = 0.7
+const THRESHOLD = 0.8
 
 const WEBCAMERA = 'WEBCAMERA'
 const MOBILE_WITH_HAND = 'MOBILE_WITH_HAND'
@@ -148,13 +148,11 @@ const EyeVote = (props) => {
                 })
 
                 socket.on('update-web-question', msg => {
-                    if (msg === -2) {
-                        // if (condition) {
+                    console.log('update-question', msg)
+                    if (condition) {
                         conditionRef.current = condition
                         participantRef.current = pid
-                        // questionSetNo.current = pid.split('_')[1] % 3
                         start();
-                        // }
                     }
                     nextQuestion()
                 })

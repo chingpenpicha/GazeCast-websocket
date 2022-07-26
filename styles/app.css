@@ -188,7 +188,7 @@ ol>li:before {
     color: white;
     border-radius: 3vh;
     top: 35vh;
-    left: 15vw;
+    left: 20vw;
     animation: circular 17s linear infinite;
 }
 
@@ -226,7 +226,7 @@ ol>li:before {
 @keyframes diagonal {
     from {
         top: 20vh;
-        left: 75vw
+        left: 80vw
     }
 
     to {
@@ -248,32 +248,32 @@ ol>li:before {
 @keyframes zigzag {
     0% {
         top: 70vh;
-        left: 75vw
+        left: 83vw
     }
 
     20% {
         top: 55vh;
-        left: 62vw
+        left: 70vw
     }
 
     40% {
         top: 70vh;
-        left: 47vw
+        left: 55vw
     }
 
     60% {
         top: 55vh;
-        left: 36vw
+        left: 44vw
     }
 
     80% {
         top: 70vh;
-        left: 23vw
+        left: 30vw
     }
 
     100% {
         top: 55vh;
-        left: 10vw
+        left: 13vw
     }
 }
 
