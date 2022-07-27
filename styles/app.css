@@ -183,16 +183,16 @@ ol>li:before {
 
 .answerOne {
     position: absolute;
-    width: 10vh;
-    height: 10vh;
+    width: 9vh;
+    height: 9vh;
     /* text-align: center;
     line-height: 2;
     /* background-color: white; */
     color: white;
     border-radius: 3vh;
     top: 35vh;
-    left: 20vw;
-    animation: circular 14s linear infinite;
+    left: 25vw;
+    animation: circular 12s linear infinite;
 }
 
 .answerTwo {

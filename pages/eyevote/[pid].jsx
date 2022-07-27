@@ -11,7 +11,7 @@ import { useRouter } from 'next/router'
 
 const WINDOW_SIZE = 1000 // 1 second
 const THRESHOLD = 0.8
-const SIZE_OF_ARR = 50
+const SIZE_OF_ARR = 60
 
 const WEBCAMERA = 'WEBCAMERA'
 const MOBILE_WITH_HAND = 'MOBILE_WITH_HAND'
@@ -293,6 +293,8 @@ const EyeVote = (props) => {
             // push label positions into the arrays
             logGazeTime.push(Timestamp.now())
 
+            console.log(logLabelPositionOne_x.length, logGazePosition_x.length)
+
             if (logLabelPositionOne_x.length > SIZE_OF_ARR) {
                 logLabelPositionOne_x = logLabelPositionOne_x.slice(logLabelPositionOne_x.length - SIZE_OF_ARR)
             }
@@ -380,6 +382,7 @@ const EyeVote = (props) => {
                         logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                         isChangeAns = true
                         answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'PINK' : 'BROWN'
+                        console.log(logData.selected_answer)
 
                     } else if ((temp_corAnswerTwo >= THRESHOLD) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
                         logData.selected_answer = TWO
@@ -390,6 +393,7 @@ const EyeVote = (props) => {
                         logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                         isChangeAns = true
                         answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'PINK' : 'BROWN'
+                        console.log(logData.selected_answer)
 
                     } else if ((temp_corAnswerThree >= THRESHOLD) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
                         logData.selected_answer = THREE
@@ -400,7 +404,7 @@ const EyeVote = (props) => {
                         logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                         isChangeAns = true
                         answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'PINK' : 'BROWN'
-
+                        console.log(logData.selected_answer)
                     }
 
 
@@ -414,6 +418,7 @@ const EyeVote = (props) => {
                         isChangeAns = true
                         answerselected.current = NOT_DETECT
                     }
+
 
                     // log data into firestore
                     addDoc(dataRef, logData);
