@@ -179,7 +179,6 @@ const EyeVote = (props) => {
 
 
         //start log overall time
-        start();
 
         console.log('w: ', window.innerWidth)
         console.log('h: ', window.innerHeight)
@@ -187,26 +186,27 @@ const EyeVote = (props) => {
         setTimeout(function run() {
             // get the x and y coordinates of the labels and assign them
 
-            let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
-            let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
-            let answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
+            if (document.getElementById('answerOne')) {
+                let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
+                let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
+                let answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
 
-            // Labels
-            // x and y coordinates of labels
-            let answerOne_x = answerOne_rect.left;
-            let answerOne_y = answerOne_rect.top;
-            let answerTwo_x = answerTwo_rect.left;
-            let answerTwo_y = answerTwo_rect.top;
-            let answerThree_x = answerThree_rect.left;
-            let answerThree_y = answerThree_rect.top;
+                // Labels
+                // x and y coordinates of labels
+                let answerOne_x = answerOne_rect.left;
+                let answerOne_y = answerOne_rect.top;
+                let answerTwo_x = answerTwo_rect.left;
+                let answerTwo_y = answerTwo_rect.top;
+                let answerThree_x = answerThree_rect.left;
+                let answerThree_y = answerThree_rect.top;
 
-            logLabelPositionOne_x.push(answerOne_x)
-            logLabelPositionOne_y.push(answerOne_y)
-            logLabelPositionTwo_x.push(answerTwo_x)
-            logLabelPositionTwo_y.push(answerTwo_y)
-            logLabelPositionThree_x.push(answerThree_x)
-            logLabelPositionThree_y.push(answerThree_y)
-
+                logLabelPositionOne_x.push(answerOne_x)
+                logLabelPositionOne_y.push(answerOne_y)
+                logLabelPositionTwo_x.push(answerTwo_x)
+                logLabelPositionTwo_y.push(answerTwo_y)
+                logLabelPositionThree_x.push(answerThree_x)
+                logLabelPositionThree_y.push(answerThree_y)
+            }
             setTimeout(run, WINDOW_SIZE / 30); // To continue sending object postion
         }, WINDOW_SIZE / 30);
     }, [])
@@ -462,9 +462,21 @@ const EyeVote = (props) => {
                     <p className='question_title dimgray'>There will be one trial round, followed by six rounds of experimentation.</p>
                     <br />
                     <p className='question_title dimgray'>Choose Eye-tracker *</p>
-                    <label className='dimgray radio_op'><input type="radio" value={WEBCAMERA} name="condition" checked={condition === WEBCAMERA} onChange={(e) => { setCondition(WEBCAMERA); conditionRef.current = WEBCAMERA }} /> Web camera</label> <p />
-                    <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_STAND} name="condition" checked={condition === MOBILE_WITH_STAND} onChange={(e) => { setCondition(MOBILE_WITH_STAND); conditionRef.current = MOBILE_WITH_STAND }} /> Mobile with fixed stand</label><p />
-                    <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_HAND} name="condition" checked={condition === MOBILE_WITH_HAND} onChange={(e) => { setCondition(MOBILE_WITH_HAND); conditionRef.current = MOBILE_WITH_HAND }} /> Mobile with hand</label><p />
+                    <label className='dimgray radio_op'><input type="radio" value={WEBCAMERA} name="condition" checked={condition === WEBCAMERA} onChange={(e) => {
+                        setCondition(WEBCAMERA);
+                        conditionRef.current = WEBCAMERA
+                        start()
+                    }} /> Web camera</label> <p />
+                    <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_STAND} name="condition" checked={condition === MOBILE_WITH_STAND} onChange={(e) => {
+                        setCondition(MOBILE_WITH_STAND);
+                        conditionRef.current = MOBILE_WITH_STAND
+                        start()
+                    }} /> Mobile with fixed stand</label><p />
+                    <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_HAND} name="condition" checked={condition === MOBILE_WITH_HAND} onChange={(e) => {
+                        setCondition(MOBILE_WITH_HAND);
+                        conditionRef.current = MOBILE_WITH_HAND
+                        start()
+                    }} /> Mobile with hand</label><p />
                     {/* <h4 className='instructions marginTop'>The study will start with a calibration.</h4> */}
                     {condition !== WEBCAMERA &&
                         <>
