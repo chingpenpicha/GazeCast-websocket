@@ -9,9 +9,9 @@ import calculateCorrelation from "calculate-correlation"
 import io from 'socket.io-client'
 import { useRouter } from 'next/router'
 
-const WINDOW_SIZE = 2000 // 2 second
+const WINDOW_SIZE = 1000 // 1 second
 const THRESHOLD = 0.8
-const SIZE_OF_ARR = 150
+const SIZE_OF_ARR = 50
 
 const WEBCAMERA = 'WEBCAMERA'
 const MOBILE_WITH_HAND = 'MOBILE_WITH_HAND'
@@ -207,8 +207,8 @@ const EyeVote = (props) => {
             logLabelPositionThree_x.push(answerThree_x)
             logLabelPositionThree_y.push(answerThree_y)
 
-            setTimeout(run, WINDOW_SIZE / 60); // To continue sending object postion
-        }, WINDOW_SIZE / 60);
+            setTimeout(run, WINDOW_SIZE / 30); // To continue sending object postion
+        }, WINDOW_SIZE / 30);
     }, [])
 
     useEffect(() => {
@@ -371,7 +371,7 @@ const EyeVote = (props) => {
 
                     }
 
-                    if ((temp_corAnswerOne >= THRESHOLD) && (temp_corAnswerOne < 1) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
+                    if ((temp_corAnswerOne >= THRESHOLD) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
                         logData.selected_answer = ONE
                         logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
                         logData.selected_cor = temp_corAnswerOne
@@ -381,7 +381,7 @@ const EyeVote = (props) => {
                         isChangeAns = true
                         answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'PINK' : 'BROWN'
 
-                    } else if ((temp_corAnswerTwo >= THRESHOLD) && (temp_corAnswerTwo < 1) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
+                    } else if ((temp_corAnswerTwo >= THRESHOLD) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
                         logData.selected_answer = TWO
                         logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'CORRECT' : "WRONG"
                         logData.selected_cor = temp_corAnswerTwo
@@ -391,7 +391,7 @@ const EyeVote = (props) => {
                         isChangeAns = true
                         answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'PINK' : 'BROWN'
 
-                    } else if ((temp_corAnswerThree >= THRESHOLD) && (temp_corAnswerThree < 1) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
+                    } else if ((temp_corAnswerThree >= THRESHOLD) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
                         logData.selected_answer = THREE
                         logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'CORRECT' : "WRONG"
                         logData.selected_cor = temp_corAnswerThree
@@ -404,16 +404,16 @@ const EyeVote = (props) => {
                     }
 
 
-                    /// clear array : TIME OUT AFTER 40 seconds
-                    // if (logLabelPositionOne_x.length > 20) {
-                    //     logData.select_status = "TIME_OUT"
-                    //     logData.select_status = NOT_DETECT
-                    //     logData.selected_at = Timestamp.now()
-                    //     logData.selected_at_UNIX = Timestamp.now().toMillis()
-                    //     logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
-                    //     isChangeAns = true
-                    //     answerselected.current = NOT_DETECT
-                    // }
+                    /// clear array : TIME OUT AFTER 30 seconds
+                    if (logGazeTime.length > 30) {
+                        logData.select_status = "TIME_OUT"
+                        logData.select_status = NOT_DETECT
+                        logData.selected_at = Timestamp.now()
+                        logData.selected_at_UNIX = Timestamp.now().toMillis()
+                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                        isChangeAns = true
+                        answerselected.current = NOT_DETECT
+                    }
 
                     // log data into firestore
                     addDoc(dataRef, logData);

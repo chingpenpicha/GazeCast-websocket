@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import io from 'socket.io-client'
 
-const WINDOW_SIZE = 2000 // 2 second
+const WINDOW_SIZE = 1000 // 1 second
 const licenseKey = process.env.SEESO_KEY
 let socket
 
