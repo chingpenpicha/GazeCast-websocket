@@ -11,7 +11,7 @@ import { useRouter } from 'next/router'
 
 const WINDOW_SIZE = 1000 // 1 second
 const THRESHOLD = 0.8
-const SIZE_OF_ARR = 100
+const SIZE_OF_ARR = 50
 
 const WEBCAMERA = 'WEBCAMERA'
 const MOBILE_WITH_HAND = 'MOBILE_WITH_HAND'
