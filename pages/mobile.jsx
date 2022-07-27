@@ -8,6 +8,7 @@ let socket
 const MobileEyeTrack = () => {
     const firstRenderRef = useRef(true);
     const [question, setQuestion] = useState(-1)
+    const [windowSize, setWindowSize] = useState({ w: 0, h: 0 })
     const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
     const [gazeLog, setGazeLog] = useState({
         max_x: -1000, max_y: -1000, min_x: 2000, min_y: 2000
@@ -62,7 +63,7 @@ const MobileEyeTrack = () => {
 
     useEffect(() => {
         // for dev
-        // protect double call 
+        // protect double call
         // if (firstRenderRef.current) {
         //     firstRenderRef.current = false;
         //     return;
@@ -96,15 +97,20 @@ const MobileEyeTrack = () => {
             const seeSo = new EasySeeSo.default();
             console.log(seeSo)
             await seeSo.init(licenseKey, () => {
-                seeSo.setMonitorSize(32);
-                seeSo.setFaceDistance(20);
-                // seeSo.setCameraPosition(window.outerWidth / 2, true);
+                // seeSo.setMonitorSize(32);
+                seeSo.setFaceDistance(25);
+                seeSo.setCameraPosition(window.outerWidth / 2, true);
+                // console.log('w: ', window.outerWidth)
+                // console.log('h: ', window.outerHeight)
                 seeSo.startTracking(onGaze, onDebug)
                 socket.emit('send-eyetracker-connection', true)
             }, () => { alert('init SeeSo failed') })
         }
 
         initSeeSo()
+
+        setWindowSize({ w: window.innerWidth, h: window.innerHeight })
+
 
         //continuing sending objet position
         setTimeout(function run() {
@@ -135,7 +141,7 @@ const MobileEyeTrack = () => {
                 <h4>
                     Connected with the display!
                 </h4>
-                <button onClick={sendNext}>Next</button>
+                <button className="start-button" onClick={sendNext}>Next</button>
             </>}
             {(question >= 0 && question <= 6) && <>
                 <p>{`Current question : ${question}`}</p>
@@ -148,6 +154,9 @@ const MobileEyeTrack = () => {
             <h4>{`gazeY : ${gazePosition.y}`}</h4>
             <p>X range: {gazeLog.min_x} - {gazeLog.max_x}</p>
             <p>Y range: {gazeLog.min_y} - {gazeLog.max_y}</p>
+
+            <p>window w: {windowSize.w} </p>
+            <p>window h: {windowSize.h} </p>
         </div>
     )
 }

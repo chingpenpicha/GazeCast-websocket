@@ -134,10 +134,10 @@ const EyeVote = (props) => {
 
     useEffect(() => {
         // for dev
-        if (firstRenderRef.current) {
-            firstRenderRef.current = false;
-            return;
-        }
+        // if (firstRenderRef.current) {
+        //     firstRenderRef.current = false;
+        //     return;
+        // }
         const socketInitializer = async () => {
             console.log('init socket')
             await fetch('/api/socket');
@@ -320,6 +320,8 @@ const EyeVote = (props) => {
                     logData.end_time = end_time
                     logData.end_time_UNIX = end_time.toMillis()
                     logData.interaction_time = end_time.toMillis - interactionTime.current
+                    logData.window_height = window.innerHeight
+                    logData.window_width = window.innerWidth
 
                 }
 
@@ -450,12 +452,17 @@ const EyeVote = (props) => {
     const SecondScreen = (props) => {
         return (
             <div className='Eyevote'>
-                <div className="descriptionBox">
+                <div className="descriptionBox boxCenter">
                     <h1 className='titleEyeVote'>{props.header}</h1>
 
                     {/* < className='instructions'>Follow the circle by following its movement with your gaze.</h4> */}
                     <p className='instructions'>Find and follow the <span className='pink'>PINK</span> potato moving on the screen</p>
-
+                    <Image
+                        src={'/pink_cute.png'}
+                        alt="Pink potato"
+                        width={600}
+                        height={250}
+                    />
 
                     <p className='question_title dimgray'>{`Eye-tracker status: `}
                         <span className={eyetrackerConnected ? 'green' : 'red'}>
@@ -470,7 +477,7 @@ const EyeVote = (props) => {
                         </button>
                     </div>}
                 </div>
-            </div>
+            </div >
         );
     }
 

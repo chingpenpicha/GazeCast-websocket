@@ -8,7 +8,8 @@
     font-family: 'ABeeZee';
     color: black;
     margin: 50px;
-    font-weight: bold
+    font-weight: bold;
+    font-size: 4vh;
 }
 
 .question_title {
@@ -18,11 +19,12 @@
     font-size: 4vh;
 }
 
-.body {
+.App>.body {
     font-family: 'Myriad Pro Regular';
     color: black;
     margin-left: 50px;
     margin-right: 50px;
+    font-size: 24px;
 }
 
 .note {
@@ -38,11 +40,11 @@
 }
 
 .start-button {
-    margin-left: 50px;
+    margin: 0 50px;
     border-color: none;
     color: black;
     text-align: center;
-    font-size: 16px;
+    font-size: 24px;
     width: 200px;
     height: 50px;
 }
@@ -324,7 +326,7 @@ ol>li:before {
 }
 
 .pink {
-    color: palevioletred
+    color: #f58e83
 }
 
 .brown {

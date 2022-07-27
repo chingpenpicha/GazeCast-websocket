@@ -9,6 +9,7 @@ const Webcamera = () => {
   const firstRenderRef = useRef(true);
   const [question, setQuestion] = useState(-1)
   const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
+  const [windowSize, setWindowSize] = useState({ w: 0, h: 0 })
   const [gazeLog, setGazeLog] = useState({
     max_x: -1000, max_y: -1000, min_x: 2000, min_y: 2000
   })
@@ -98,6 +99,8 @@ const Webcamera = () => {
         seeSo.startTracking(onGaze, onDebug)
         socket.emit('send-eyetracker-connection', true)
       }, () => { alert('init SeeSo failed') })
+
+      setWindowSize({ w: window.innerWidth, h: window.innerHeight })
     }
 
     initSeeSo()
@@ -106,7 +109,7 @@ const Webcamera = () => {
     setTimeout(function run() {
       // get the x and y coordinates of the labels and assign them
       if (gaze_x && gaze_y) {
-        const gazeObj = { gaze_x, gaze_y, page: 'mobile' }
+        const gazeObj = { gaze_x, gaze_y, page: 'webcam' }
         socket.emit('gaze-position-change', gazeObj)
       }
       setTimeout(run, WINDOW_SIZE); // To continue sending object postion
@@ -138,8 +141,10 @@ const Webcamera = () => {
       </div>}
       <h4>{`gazeX : ${gazePosition.x}`}</h4>
       <h4>{`gazeY : ${gazePosition.y}`}</h4>
-      <p>X range: {gazeLog.min_x} - {gazeLog.max_x}</p>
-      <p>Y range: {gazeLog.min_y} - {gazeLog.max_y}</p>
+      <p>X range: {gazeLog.min_x} -- {gazeLog.max_x}</p>
+      <p>Y range: {gazeLog.min_y} -- {gazeLog.max_y}</p>
+      <p>window w: {windowSize.w} </p>
+      <p>window h: {windowSize.h} </p>
     </div>
   )
 }

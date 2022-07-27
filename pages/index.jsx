@@ -22,8 +22,9 @@ const Home = () => {
             <h1 className="title">Eye-Tracking Study: GazeCast </h1>
 
             <div className="body">
-                <p className='question_title'>Participant Id: <span style={{ color: 'red' }}>{idErr}</span></p>
+                <b >Participant Id: </b>
                 <input type="text" pid="pid" value={pid} onChange={(e) => setPid(e.target.value)} />
+                <p style={{ color: 'red' }}>{idErr}</p>
             </div>
             <p className="body">First of all, thank you for your interest in my Master Thesis study “GazeCast: Using mobile for eye tracking on public display by Pursuit”.</p>
             <p className="body">The purpose of this experiment is to evaluate the effectiveness of an eye-tracker provided by a smartphone camera to that of a standard web camera. </p>
