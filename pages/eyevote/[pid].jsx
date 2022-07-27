@@ -11,7 +11,7 @@ import { useRouter } from 'next/router'
 
 const WINDOW_SIZE = 1000 // 1 second
 const THRESHOLD = 0.8
-const SIZE_OF_ARR = 30
+const SIZE_OF_ARR = 60
 
 const WEBCAMERA = 'WEBCAMERA'
 const MOBILE_WITH_HAND = 'MOBILE_WITH_HAND'
@@ -22,42 +22,7 @@ const TWO = "TWO"
 const THREE = "THREE"
 const NOT_DETECT = "NOT_DETECT"
 
-// const questionArray = [{
-//     1: CIRCULAR,
-//     2: ZIGZAG,
-//     3: DIAGONAL,
-//     4: DIAGONAL,
-//     5: CIRCULAR,
-//     6: ZIGZAG,
-//     7: ZIGZAG,
-//     8: DIAGONAL,
-//     9: CIRCULAR,
-// },
-// {
-//     1: ZIGZAG,
-//     2: DIAGONAL,
-//     3: CIRCULAR,
-//     4: CIRCULAR,
-//     5: ZIGZAG,
-//     6: DIAGONAL,
-//     7: DIAGONAL,
-//     8: CIRCULAR,
-//     9: ZIGZAG,
-// },
-// {
-//     1: DIAGONAL,
-//     2: CIRCULAR,
-//     3: ZIGZAG,
-//     4: ZIGZAG,
-//     5: DIAGONAL,
-//     6: CIRCULAR,
-//     7: CIRCULAR,
-//     8: ZIGZAG,
-//     9: DIAGONAL,
-// },]
-
 const questionArray = [{
-    // 1: { prompt: "Find the PINK potatoe!", one: "brown_1", two: "pink", three: "brown_3" },
     0: { prompt: "(Training)", one: "brown", two: "brown", three: "pink" },
     1: { prompt: "(1)", one: "pink", two: "brown", three: "brown" },
     2: { prompt: "(2)", one: "brown", two: "pink", three: "brown" },
@@ -65,7 +30,26 @@ const questionArray = [{
     4: { prompt: "(4)", one: "brown", two: "pink", three: "brown" },
     5: { prompt: "(5)", one: "brown", two: "brown", three: "pink" },
     6: { prompt: "(6)", one: "pink", two: "brown", three: "brown" },
-}]
+},
+{
+    0: { prompt: "(Training)", one: "pink", two: "brown", three: "brown" },
+    1: { prompt: "(1)", one: "brown", two: "brown", three: "pink" },
+    2: { prompt: "(2)", one: "brown", two: "pink", three: "brown" },
+    3: { prompt: "(3)", one: "pink", two: "brown", three: "brown" },
+    4: { prompt: "(4)", one: "brown", two: "brown", three: "pink" },
+    5: { prompt: "(5)", one: "pink", two: "brown", three: "brown" },
+    6: { prompt: "(6)", one: "brown", two: "pink", three: "brown" },
+},
+{
+    0: { prompt: "(Training)", one: "brown", two: "pink", three: "brown" },
+    1: { prompt: "(1)", one: "pink", two: "brown", three: "brown" },
+    2: { prompt: "(2)", one: "brown", two: "brown", three: "pink" },
+    3: { prompt: "(3)", one: "brown", two: "pink", three: "brown" },
+    4: { prompt: "(4)", one: "pink", two: "brown", three: "brown" },
+    5: { prompt: "(5)", one: "brown", two: "pink", three: "brown" },
+    6: { prompt: "(6)", one: "brown", two: "brown", three: "pink" },
+},
+]
 
 /*
 1 = CIRCULAR
@@ -78,9 +62,25 @@ const CHOICE_TO_SELECT = [{
     2: TWO,
     3: THREE,
     4: TWO,
+    5: THREE,
+    6: ONE,
+}, {
+    0: ONE,
+    1: THREE,
+    2: TWO,
+    3: ONE,
+    4: THREE,
     5: ONE,
+    6: TWO,
+}, {
+    0: TWO,
+    1: ONE,
+    2: THREE,
+    3: TWO,
+    4: ONE,
+    5: TWO,
     6: THREE,
-}]
+},]
 
 
 let socket
@@ -140,6 +140,7 @@ const EyeVote = (props) => {
         //     firstRenderRef.current = false;
         //     return;
         // }
+        questionSetNo.current = Math.floor(Math.random() * 3)
         const socketInitializer = async () => {
             console.log('init socket')
             await fetch('/api/socket');
@@ -162,9 +163,33 @@ const EyeVote = (props) => {
                     gaze_x = obj.gaze_x
                     gaze_y = obj.gaze_y
                     // console.log('x: ', gaze_x, '  y:', gaze_y)
-                    if (question.current >= 0 && question.current <= 6 && !undoscreen.current) {
-                        _calculateCorrelation()
-                    }
+
+                    // if (document.getElementById('answerOne')) {
+                    let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
+                    let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
+                    let answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
+
+                    // Labels
+                    // x and y coordinates of labels
+                    let answerOne_x = answerOne_rect.left;
+                    let answerOne_y = answerOne_rect.top;
+                    let answerTwo_x = answerTwo_rect.left;
+                    let answerTwo_y = answerTwo_rect.top;
+                    let answerThree_x = answerThree_rect.left;
+                    let answerThree_y = answerThree_rect.top;
+
+                    // push gaze data into the arrays
+                    logGazePosition_x.push(gaze_x)
+                    logGazePosition_y.push(gaze_y)
+                    // push label positions into the arrays
+
+                    logLabelPositionOne_x.push(answerOne_x)
+                    logLabelPositionOne_y.push(answerOne_y)
+                    logLabelPositionTwo_x.push(answerTwo_x)
+                    logLabelPositionTwo_y.push(answerTwo_y)
+                    logLabelPositionThree_x.push(answerThree_x)
+                    logLabelPositionThree_y.push(answerThree_y)
+
                 })
 
                 socket.on('update-eyetracker-connection', msg => {
@@ -176,39 +201,18 @@ const EyeVote = (props) => {
         }
         socketInitializer()
 
-
-
         //start log overall time
-
         console.log('w: ', window.innerWidth)
         console.log('h: ', window.innerHeight)
 
         setTimeout(function run() {
             // get the x and y coordinates of the labels and assign them
-
-            if (document.getElementById('answerOne')) {
-                let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
-                let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
-                let answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
-
-                // Labels
-                // x and y coordinates of labels
-                let answerOne_x = answerOne_rect.left;
-                let answerOne_y = answerOne_rect.top;
-                let answerTwo_x = answerTwo_rect.left;
-                let answerTwo_y = answerTwo_rect.top;
-                let answerThree_x = answerThree_rect.left;
-                let answerThree_y = answerThree_rect.top;
-
-                logLabelPositionOne_x.push(answerOne_x)
-                logLabelPositionOne_y.push(answerOne_y)
-                logLabelPositionTwo_x.push(answerTwo_x)
-                logLabelPositionTwo_y.push(answerTwo_y)
-                logLabelPositionThree_x.push(answerThree_x)
-                logLabelPositionThree_y.push(answerThree_y)
+            if (question.current >= 0 && question.current <= 6 && !undoscreen.current) {
+                _calculateCorrelation()
             }
-            setTimeout(run, WINDOW_SIZE / 30); // To continue sending object postion
-        }, WINDOW_SIZE / 30);
+
+            setTimeout(run, WINDOW_SIZE); // To continue sending object postion
+        }, WINDOW_SIZE);
     }, [])
 
     useEffect(() => {
@@ -282,18 +286,13 @@ const EyeVote = (props) => {
 
     // calculates Correlation
     function _calculateCorrelation() {
-        //if gaze x and gaze y have value
-        if ((!undoscreen.current) && question.current >= 0) {
+
+        if ((!undoscreen.current) && question.current >= 0 && logGazePosition_x.length >= SIZE_OF_ARR) {
             //check change ans
             let isChangeAns = false
+            console.log(logGazePosition_x.length, logLabelPositionOne_x.length)
 
-            // push gaze data into the arrays
-            logGazePosition_x.push(...gaze_x)
-            logGazePosition_y.push(...gaze_y)
-            // push label positions into the arrays
             logGazeTime.push(Timestamp.now())
-
-            console.log(logLabelPositionOne_x.length, logGazePosition_x.length)
 
             if (logLabelPositionOne_x.length > SIZE_OF_ARR) {
                 logLabelPositionOne_x = logLabelPositionOne_x.slice(logLabelPositionOne_x.length - SIZE_OF_ARR)
@@ -345,8 +344,8 @@ const EyeVote = (props) => {
                         participantId: participantRef.current,
                         questionNo: question.current,
                         condition: conditionRef.current,
-                        // gaze_x,
-                        // gaze_y,
+                        gaze_x,
+                        gaze_y,
                         timestamp: Timestamp.now(),
                         timestamp_UNIX: Timestamp.now().toMillis(),
                         // obj_one_x: answerOne_x,
@@ -382,7 +381,7 @@ const EyeVote = (props) => {
                         logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                         isChangeAns = true
                         answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'PINK' : 'BROWN'
-                        console.log(logData.selected_answer)
+                        console.log('ANS is : ', logData.selected_answer)
 
                     } else if ((temp_corAnswerTwo >= THRESHOLD) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
                         logData.selected_answer = TWO
@@ -393,7 +392,7 @@ const EyeVote = (props) => {
                         logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                         isChangeAns = true
                         answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'PINK' : 'BROWN'
-                        console.log(logData.selected_answer)
+                        console.log('ANS is : ', logData.selected_answer)
 
                     } else if ((temp_corAnswerThree >= THRESHOLD) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
                         logData.selected_answer = THREE
@@ -404,7 +403,7 @@ const EyeVote = (props) => {
                         logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                         isChangeAns = true
                         answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'PINK' : 'BROWN'
-                        console.log(logData.selected_answer)
+                        console.log('ANS is : ', logData.selected_answer)
                     }
 
 
@@ -418,7 +417,6 @@ const EyeVote = (props) => {
                         isChangeAns = true
                         answerselected.current = NOT_DETECT
                     }
-
 
                     // log data into firestore
                     addDoc(dataRef, logData);
@@ -500,9 +498,6 @@ const EyeVote = (props) => {
                     {condition === WEBCAMERA && <div className="boxCenter">
                         <button className='button' onClick={() => {
                             if (condition) {
-                                // conditionRef.current = condition
-                                // participantRef.current = pid
-                                // start();
                                 nextQuestion()
                             }
                         }}>

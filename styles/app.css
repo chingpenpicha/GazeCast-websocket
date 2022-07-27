@@ -42,17 +42,21 @@
 .start-button {
     margin: 0 50px;
     border-color: none;
-    color: black;
+    background-color: rgb(255, 160, 176);
+    color: white;
     text-align: center;
     font-size: 24px;
     width: 200px;
     height: 50px;
+
 }
 
 .button {
     border-color: none;
     color: black;
     text-align: center;
+    background-color: rgb(255, 160, 176);
+    color: black;
     font-size: 24px;
     width: 200px;
     height: 50px;
@@ -121,7 +125,7 @@ ol>li:before {
 }
 
 .Eyevote {
-    background: #feecce;
+    background: lightgray;
     font-family: "Microsoft Sans Serif";
     color: dimgray;
     height: 100vh;
@@ -183,8 +187,8 @@ ol>li:before {
 
 .answerOne {
     position: absolute;
-    width: 9vh;
-    height: 9vh;
+    width: 10vh;
+    height: 10vh;
     /* text-align: center;
     line-height: 2;
     /* background-color: white; */
@@ -192,7 +196,7 @@ ol>li:before {
     border-radius: 3vh;
     top: 35vh;
     left: 25vw;
-    animation: circular 12s linear infinite;
+    animation: circular 8s linear infinite;
 }
 
 .answerTwo {
@@ -206,7 +210,7 @@ ol>li:before {
     border-radius: 3vh;
     top: 35vh;
     left: 15vw;
-    animation: zigzag 13s linear infinite;
+    animation: zigzag 10s linear infinite;
     animation-direction: alternate;
 }
 
@@ -220,7 +224,7 @@ ol>li:before {
     color: white;
     border-radius: 3vh;
     animation-name: diagonal;
-    animation-duration: 5s;
+    animation-duration: 4s;
     animation-iteration-count: infinite;
     animation-direction: alternate;
     animation-timing-function: linear;
@@ -228,7 +232,7 @@ ol>li:before {
 
 @keyframes diagonal {
     from {
-        top: 20vh;
+        top: 25vh;
         left: 80vw
     }
 
@@ -240,18 +244,18 @@ ol>li:before {
 
 @keyframes circular {
     from {
-        transform: rotate(0deg) translateX(11vw) rotate(0deg);
+        transform: rotate(0deg) translateX(9vw) rotate(0deg);
     }
 
     to {
-        transform: rotate(360deg) translateX(11vw) rotate(-360deg);
+        transform: rotate(360deg) translateX(9vw) rotate(-360deg);
     }
 }
 
 @keyframes zigzag {
     0% {
         top: 70vh;
-        left: 83vw
+        left: 80vw
     }
 
     20% {
@@ -276,7 +280,7 @@ ol>li:before {
 
     100% {
         top: 55vh;
-        left: 13vw
+        left: 15vw
     }
 }
 

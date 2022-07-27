@@ -19,46 +19,53 @@ const Webcamera = () => {
   let logGazeY = []
   let gaze_x
   let gaze_y
+  let TrackingState
 
   function onGaze(gazeInfo) {
     // do something with gaze info.
-    // console.log('gazeInfo', gazeInfo.x, gazeInfo.y)
-    let gazeLog_temp = gazeLog
-    setGazePosition({ ...gazeInfo })
-    if (!gaze_x) {
-      console.log("X_NAN")
-    }
-    if (!gaze_y) {
-      console.log("Y_NAN")
-    }
+    if (TrackingState && gazeInfo.trackingState === TrackingState.SUCCESS) {
 
-    gaze_x = gazeInfo.x
-    gaze_y = gazeInfo.y
 
-    if (gaze_x) {
-      logGazeX.push(gaze_x)
-    }
-    if (gaze_y) {
-      logGazeY.push(gaze_y)
-    }
+      let gazeLog_temp = gazeLog
+      setGazePosition({ ...gazeInfo })
+      if (!gaze_x) {
+        console.log("X_NAN")
+      }
+      if (!gaze_y) {
+        console.log("Y_NAN")
+      }
 
-    if (gaze_x > gazeLog.max_x) {
-      gazeLog_temp.max_x = gaze_x
-    }
+      gaze_x = gazeInfo.x
+      gaze_y = gazeInfo.y
+      const gazeObj = { gaze_x, gaze_y, page: 'webcam' }
 
-    if (gaze_x < gazeLog.min_x) {
-      gazeLog_temp.min_x = gaze_x
-    }
+      socket.emit('gaze-position-change', gazeObj)
 
-    if (gaze_y > gazeLog.max_y) {
-      gazeLog_temp.max_y = gaze_y
-    }
+      if (gaze_x) {
+        logGazeX.push(gaze_x)
+      }
+      if (gaze_y) {
+        logGazeY.push(gaze_y)
+      }
 
-    if (gaze_x < gazeLog.min_y) {
-      gazeLog_temp.min_y = gaze_y
-    }
+      if (gaze_x > gazeLog.max_x) {
+        gazeLog_temp.max_x = gaze_x
+      }
 
-    setGazeLog(gazeLog_temp)
+      if (gaze_x < gazeLog.min_x) {
+        gazeLog_temp.min_x = gaze_x
+      }
+
+      if (gaze_y > gazeLog.max_y) {
+        gazeLog_temp.max_y = gaze_y
+      }
+
+      if (gaze_x < gazeLog.min_y) {
+        gazeLog_temp.min_y = gaze_y
+      }
+
+      setGazeLog(gazeLog_temp)
+    }
   }
 
   // debug callback.
@@ -94,6 +101,8 @@ const Webcamera = () => {
 
     const initSeeSo = async () => {
       const EasySeeSo = await import('../seeso-minjs/easy-seeso')
+      const temp = await import('../seeso-minjs/seeso.min.js')
+
       /**
        * set monitor size.    default: 13 inch.
        * set face distance.   default: 30 cm.
@@ -102,6 +111,8 @@ const Webcamera = () => {
        * cameraOnTop: true
        */
       const seeSo = new EasySeeSo.default();
+      TrackingState = temp.TrackingState
+
       console.log(seeSo)
       await seeSo.init(licenseKey, () => {
         seeSo.setMonitorSize(32); //22
@@ -117,14 +128,14 @@ const Webcamera = () => {
     initSeeSo()
 
     //continuing sending objet position
-    setTimeout(function run() {
-      // get the x and y coordinates of the labels and assign them
-      const gazeObj = { gaze_x: logGazeX, gaze_y: logGazeY, page: 'webcam' }
-      logGazeX = []
-      logGazeY = []
-      socket.emit('gaze-position-change', gazeObj)
-      setTimeout(run, WINDOW_SIZE); // To continue sending object postion
-    }, WINDOW_SIZE);
+    // setTimeout(function run() {
+    //   // get the x and y coordinates of the labels and assign them
+    //   const gazeObj = { gaze_x: logGazeX, gaze_y: logGazeY, page: 'webcam' }
+    //   logGazeX = []
+    //   logGazeY = []
+    //   socket.emit('gaze-position-change', gazeObj)
+    //   setTimeout(run, WINDOW_SIZE); // To continue sending object postion
+    // }, WINDOW_SIZE);
 
   }, [])
 
