@@ -57,7 +57,7 @@ const MobileEyeTrack = () => {
     }
 
     const sendNext = () => {
-        socket.emit('click-next-question', question + 1)
+        socket.emit('click-next-question', question)
     }
 
     useEffect(() => {
@@ -97,7 +97,7 @@ const MobileEyeTrack = () => {
             console.log(seeSo)
             await seeSo.init(licenseKey, () => {
                 seeSo.setMonitorSize(32);
-                seeSo.setFaceDistance(25);
+                seeSo.setFaceDistance(20);
                 // seeSo.setCameraPosition(window.outerWidth / 2, true);
                 seeSo.startTracking(onGaze, onDebug)
                 socket.emit('send-eyetracker-connection', true)
@@ -110,7 +110,7 @@ const MobileEyeTrack = () => {
         setTimeout(function run() {
             // get the x and y coordinates of the labels and assign them
             if (gaze_x && gaze_y) {
-                const gazeObj = { gaze_x: gaze_x * 2, gaze_y: gaze_y * 2, page: 'mobile' }
+                const gazeObj = { gaze_x, gaze_y, page: 'mobile' }
                 socket.emit('gaze-position-change', gazeObj)
             }
             setTimeout(run, WINDOW_SIZE); // To continue sending object postion

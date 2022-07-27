@@ -134,10 +134,10 @@ const EyeVote = (props) => {
 
     useEffect(() => {
         // for dev
-        // if (firstRenderRef.current) {
-        //     firstRenderRef.current = false;
-        //     return;
-        // }
+        if (firstRenderRef.current) {
+            firstRenderRef.current = false;
+            return;
+        }
         const socketInitializer = async () => {
             console.log('init socket')
             await fetch('/api/socket');
@@ -149,7 +149,7 @@ const EyeVote = (props) => {
 
                 socket.on('update-web-question', msg => {
                     console.log('update-question', msg)
-                    if (condition) {
+                    if (condition && pid) {
                         conditionRef.current = condition
                         participantRef.current = pid
                         start();
@@ -228,22 +228,6 @@ const EyeVote = (props) => {
             interactionTime.current = start_time.toMillis()
         }
     }
-
-    // const endExperiment = () => {
-    //     if (condition && pid) {
-    //         const dataRef = doc(db, conditionRef.current, participantRef.current)
-    //         const end_time = Timestamp.now()
-    //         console.log('end')
-    //         setDoc(dataRef, {
-    //             window_height: window.innerHeight,
-    //             window_width: window.innerWidth,
-    //             end_time,
-    //             end_time_UNIX: end_time.toMillis(),
-    //             interaction_time: end_time.toMillis - interactionTime.current,
-    //         }, { merge: true })
-    //     }
-    // }
-
 
     const nextQuestion = () => {
         // setQuestion(question + 1)
@@ -330,49 +314,47 @@ const EyeVote = (props) => {
                     target_to_select: CHOICE_TO_SELECT[questionSetNo.current][question.current],
                 }
 
-                if (conditionRef.current && participantRef.current) {
-                    //log end all questions
-                    if (question.current === 6) {
-                        const end_time = Timestamp.now()
-                        logData.end_time = end_time
-                        logData.end_time_UNIX = end_time.toMillis()
-                        logData.interaction_time = end_time.toMillis - interactionTime.current
-
-                    }
-
-                    if (((temp_corAnswerOne) > THRESHOLD) && (temp_corAnswerOne < 1) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
-                        logData.selected_answer = ONE
-                        logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
-                        logData.selected_cor = temp_corAnswerOne
-                        logData.selected_at = Timestamp.now()
-                        logData.selected_at_UNIX = Timestamp.now().toMillis()
-                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
-                        isChangeAns = true
-                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'PINK' : 'BROWN'
-
-                    } else if (((temp_corAnswerTwo) > THRESHOLD) && (temp_corAnswerTwo < 1) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
-                        logData.selected_answer = TWO
-                        logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'CORRECT' : "WRONG"
-                        logData.selected_cor = temp_corAnswerTwo
-                        logData.selected_at = Timestamp.now()
-                        logData.selected_at_UNIX = Timestamp.now().toMillis()
-                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
-                        isChangeAns = true
-                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'PINK' : 'BROWN'
-
-                    } else if (((temp_corAnswerThree) > THRESHOLD) && (temp_corAnswerThree < 1) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
-                        logData.selected_answer = THREE
-                        logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'CORRECT' : "WRONG"
-                        logData.selected_cor = temp_corAnswerThree
-                        logData.selected_at = Timestamp.now()
-                        logData.selected_at_UNIX = Timestamp.now().toMillis()
-                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
-                        isChangeAns = true
-                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'PINK' : 'BROWN'
-
-                    }
+                //log end all questions
+                if (question.current === 6) {
+                    const end_time = Timestamp.now()
+                    logData.end_time = end_time
+                    logData.end_time_UNIX = end_time.toMillis()
+                    logData.interaction_time = end_time.toMillis - interactionTime.current
 
                 }
+
+                if ((temp_corAnswerOne >= THRESHOLD) && (temp_corAnswerOne < 1) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
+                    logData.selected_answer = ONE
+                    logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
+                    logData.selected_cor = temp_corAnswerOne
+                    logData.selected_at = Timestamp.now()
+                    logData.selected_at_UNIX = Timestamp.now().toMillis()
+                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                    isChangeAns = true
+                    answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'PINK' : 'BROWN'
+
+                } else if ((temp_corAnswerTwo >= THRESHOLD) && (temp_corAnswerTwo < 1) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
+                    logData.selected_answer = TWO
+                    logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'CORRECT' : "WRONG"
+                    logData.selected_cor = temp_corAnswerTwo
+                    logData.selected_at = Timestamp.now()
+                    logData.selected_at_UNIX = Timestamp.now().toMillis()
+                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                    isChangeAns = true
+                    answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'PINK' : 'BROWN'
+
+                } else if ((temp_corAnswerThree >= THRESHOLD) && (temp_corAnswerThree < 1) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
+                    logData.selected_answer = THREE
+                    logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'CORRECT' : "WRONG"
+                    logData.selected_cor = temp_corAnswerThree
+                    logData.selected_at = Timestamp.now()
+                    logData.selected_at_UNIX = Timestamp.now().toMillis()
+                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                    isChangeAns = true
+                    answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'PINK' : 'BROWN'
+
+                }
+
 
                 /// clear array : TIME OUT AFTER 40 seconds
                 if (logLabelPositionOne_x.length > 20) {
@@ -383,58 +365,18 @@ const EyeVote = (props) => {
                     logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
                     isChangeAns = true
                     answerselected.current = NOT_DETECT
-
                 }
 
+                // log data into firestore
                 addDoc(dataRef, logData);
 
                 if (isChangeAns) {
-                    handleAnswerRecived()
                     undoscreen.current = true
-
+                    handleAnswerRecived()
                 }
             }
         }
     }
-
-    // log data into firestore
-
-    // async function logSubmitData(selected_ans) {
-    //     // const dataRef = doc(db, condition, pid)
-    //     console.log('in log [', question.current, '] :', conditionRef.current, participantRef.current)
-    //     if (question.current < 6) {
-    //         const dataRef = doc(db, conditionRef.current)
-    //         // await setDoc(dataRef, {
-    //         //     question_data: {
-    //         //         [`question_${question.current}`]: {
-    //         //             answerselected: selected_ans,
-    //         //             selected_at_gaze: logselected_gaze.current,
-    //         //             selected_correlation: cor_selected.current,
-    //         //             end_time: Timestamp.now(),
-    //         //             end_time_UNIX: Timestamp.now().toMillis()
-    //         //         }
-    //         //     }
-    //         // }, { merge: true })
-    //         await addDoc(dataRef, {
-    //             participantId: participantRef.current,
-    //             questionNo: question.current,
-    //             condition: conditionRef.current,
-    //             gaze_x,
-    //             gaze_y,
-    //             timestamp: Timestamp.now(),
-    //             timestamp_UNIX: Timestamp.now().toMillis(),
-    //             obj_one_x: answerOne_x,
-    //             obj_one_y: answerOne_y,
-    //             obj_two_x: answerTwo_x,
-    //             obj_two_y: answerTwo_y,
-    //             obj_three_x: answerThree_x,
-    //             obj_three_y: answerThree_y,
-    //             cor_one: temp_corAnswerOne,
-    //             cor_two: temp_corAnswerTwo,
-    //             cor_three: temp_corAnswerThree,
-    //         });
-    //     } else 
-    // }
 
     // empty arrays
     function empty() {
@@ -447,6 +389,7 @@ const EyeVote = (props) => {
         logGazePosition_x.length = 0;
         logGazePosition_y.length = 0;
         logGazeTime.length = 0;
+        // durationPerQuestion = 0;
     }
 
     function sleep(duration) {
@@ -490,7 +433,6 @@ const EyeVote = (props) => {
                             if (condition) {
                                 conditionRef.current = condition
                                 participantRef.current = pid
-                                // questionSetNo.current = pid.split('_')[1] % 3
                                 start();
                                 nextQuestion()
                             }
@@ -547,22 +489,19 @@ const EyeVote = (props) => {
                     <Image
                         src={one ? `/pink_${question.current}.png` : '/brown_1.png'}
                         alt="Answer 1"
-                        width={70}
-                        height={70}
+                        layout='fill'
                     /></div>
                 <div className={`answerTwo`} id="answerTwo" >
                     <Image
                         src={two ? `/pink_${question.current}.png` : '/brown_2.png'}
                         alt="Answer 2"
-                        width={70}
-                        height={70}
+                        layout='fill'
                     /></div>
                 <div className={`answerThree`} id="answerThree" >
                     <Image
                         src={three ? `/pink_${question.current}.png` : '/brown_3.png'}
                         alt="Answer 3"
-                        width={70}
-                        height={70}
+                        layout='fill'
                     /></div>
             </div >
         );

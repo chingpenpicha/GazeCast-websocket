@@ -15,7 +15,7 @@
     font-family: 'ABeeZee';
     color: black;
     font-weight: bold;
-    font-size: 20px;
+    font-size: 4vh;
 }
 
 .body {
@@ -51,7 +51,7 @@
     border-color: none;
     color: black;
     text-align: center;
-    font-size: 16px;
+    font-size: 24px;
     width: 200px;
     height: 50px;
     margin-bottom: 20px;
@@ -119,7 +119,7 @@ ol>li:before {
 }
 
 .Eyevote {
-    background: #fef5ec;
+    background: #feecce;
     font-family: "Microsoft Sans Serif";
     color: dimgray;
     height: 100vh;
@@ -170,19 +170,20 @@ ol>li:before {
 
 .question {
     color: dimgray;
+    text-align: center;
     font-size: 6vh;
     width: 100%;
-    top: 50px;
-    left: 30vw;
+    /* top: 50px; */
+    /* left: 30vw; */
     margin-top: 0;
     padding: 20px
 }
 
 .answerOne {
     position: absolute;
-    /* width: 6vh; */
-    /* height: 6vh; */
-    text-align: center;
+    width: 10vh;
+    height: 10vh;
+    /* text-align: center;
     line-height: 2;
     /* background-color: white; */
     color: white;
@@ -194,8 +195,8 @@ ol>li:before {
 
 .answerTwo {
     position: absolute;
-    /* width: 6vh; */
-    /* height: 6vh; */
+    width: 10vh;
+    height: 10vh;
     text-align: center;
     line-height: 2;
     /* background-color: white; */
@@ -209,8 +210,8 @@ ol>li:before {
 
 .answerThree {
     position: absolute;
-    /* width: 6vh; */
-    /* height: 6vh; */
+    width: 10vh;
+    height: 10vh;
     text-align: center;
     line-height: 2;
     /* background-color: white; */
@@ -311,6 +312,7 @@ ol>li:before {
 
 .radio_op {
     margin: 12px 0;
+    font-size: 3vh;
 }
 
 .green {
