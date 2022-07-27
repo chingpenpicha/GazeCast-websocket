@@ -174,6 +174,9 @@ const EyeVote = (props) => {
         }
         socketInitializer()
 
+        console.log('w: ', window.innerWidth)
+        console.log('h: ', window.innerHeight)
+
     }, [])
 
     const handleAnswerRecived = () => {
