@@ -149,17 +149,17 @@ const EyeVote = (props) => {
 
                 socket.on('update-web-question', msg => {
                     console.log('update-question', msg)
-                    if (condition && pid) {
-                        conditionRef.current = condition
-                        participantRef.current = pid
-                        start();
-                    }
+                    // if (condition && pid) {
+                    // conditionRef.current = condition
+                    // participantRef.current = pid
+                    // }
                     nextQuestion()
                 })
 
                 socket.on('update-gaze-position', obj => {
                     gaze_x = obj.gaze_x
                     gaze_y = obj.gaze_y
+                    console.log('x: ', gaze_x, '  y:', gaze_y)
                     if (question.current >= 0 && question.current <= 6 && !undoscreen.current) {
                         _calculateCorrelation()
                     }
@@ -173,6 +173,9 @@ const EyeVote = (props) => {
 
         }
         socketInitializer()
+
+        //start log overall time
+        start();
 
         console.log('w: ', window.innerWidth)
         console.log('h: ', window.innerHeight)
@@ -413,9 +416,9 @@ const EyeVote = (props) => {
                     <p className='question_title dimgray'>There will be one trial round, followed by six rounds of experimentation.</p>
                     <br />
                     <p className='question_title dimgray'>Choose Eye-tracker *</p>
-                    <label className='dimgray radio_op'><input type="radio" value={WEBCAMERA} name="condition" checked={condition === WEBCAMERA} onChange={(e) => setCondition(WEBCAMERA)} /> Web camera</label> <p />
-                    <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_STAND} name="condition" checked={condition === MOBILE_WITH_STAND} onChange={(e) => setCondition(MOBILE_WITH_STAND)} /> Mobile with fixed stand</label><p />
-                    <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_HAND} name="condition" checked={condition === MOBILE_WITH_HAND} onChange={(e) => setCondition(MOBILE_WITH_HAND)} /> Mobile with hand</label><p />
+                    <label className='dimgray radio_op'><input type="radio" value={WEBCAMERA} name="condition" checked={condition === WEBCAMERA} onChange={(e) => { setCondition(WEBCAMERA); conditionRef.current = WEBCAMERA }} /> Web camera</label> <p />
+                    <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_STAND} name="condition" checked={condition === MOBILE_WITH_STAND} onChange={(e) => { setCondition(MOBILE_WITH_STAND); conditionRef.current = MOBILE_WITH_STAND }} /> Mobile with fixed stand</label><p />
+                    <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_HAND} name="condition" checked={condition === MOBILE_WITH_HAND} onChange={(e) => { setCondition(MOBILE_WITH_HAND); conditionRef.current = MOBILE_WITH_HAND }} /> Mobile with hand</label><p />
                     {/* <h4 className='instructions marginTop'>The study will start with a calibration.</h4> */}
                     {condition !== WEBCAMERA &&
                         <>
@@ -436,9 +439,9 @@ const EyeVote = (props) => {
                     {condition === WEBCAMERA && <div className="boxCenter">
                         <button className='button' onClick={() => {
                             if (condition) {
-                                conditionRef.current = condition
-                                participantRef.current = pid
-                                start();
+                                // conditionRef.current = condition
+                                // participantRef.current = pid
+                                // start();
                                 nextQuestion()
                             }
                         }}>
