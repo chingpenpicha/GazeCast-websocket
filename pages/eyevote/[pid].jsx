@@ -293,7 +293,6 @@ const EyeVote = (props) => {
             // push label positions into the arrays
             logGazeTime.push(Timestamp.now())
 
-            console.log('before slice: ', logLabelPositionOne_x.length, logGazePosition_x.length)
             if (logLabelPositionOne_x.length > SIZE_OF_ARR) {
                 logLabelPositionOne_x = logLabelPositionOne_x.slice(logLabelPositionOne_x.length - SIZE_OF_ARR)
             }
@@ -319,8 +318,6 @@ const EyeVote = (props) => {
                 logGazePosition_y = logGazePosition_y.slice(logGazePosition_y.length - SIZE_OF_ARR)
             }
 
-            console.log('after slice: ', logLabelPositionOne_x.length, logGazePosition_x.length)
-
             if (logGazePosition_x.length === SIZE_OF_ARR && logLabelPositionOne_x.length === SIZE_OF_ARR) {
                 // calculate the correlation
                 let corAnswerOne_x = calculateCorrelation(logLabelPositionOne_x, logGazePosition_x);
@@ -329,7 +326,6 @@ const EyeVote = (props) => {
                 let corAnswerTwo_y = calculateCorrelation(logLabelPositionTwo_y, logGazePosition_y);
                 let corAnswerThree_x = calculateCorrelation(logLabelPositionThree_x, logGazePosition_x);
                 let corAnswerThree_y = calculateCorrelation(logLabelPositionThree_y, logGazePosition_y);
-
 
                 // calculate correlation
                 let temp_corAnswerOne = corAnswerOne_x < corAnswerOne_y ? corAnswerOne_x : corAnswerOne_y;
