@@ -17,6 +17,8 @@ const MobileEyeTrack = () => {
     const [gazeLog, setGazeLog] = useState({
         max_x: -1000, max_y: -1000, min_x: 2000, min_y: 2000
     })
+    let logGazeX = []
+    let logGazeY = []
     let gaze_x
     let gaze_y
 
@@ -31,9 +33,18 @@ const MobileEyeTrack = () => {
         if (!gaze_y) {
             console.log("Y_NAN")
         }
+
         gaze_x = gazeInfo.x
         gaze_y = gazeInfo.y
+        let new_gaze_x = gaze_x * SCREEN_WIDTH / window.innerWidth
+        let new_gaze_y = gaze_y * SCREEN_HEIGHT / window.innerHeight
 
+        if (gaze_x) {
+            logGazeX.push(new_gaze_x)
+        }
+        if (gaze_y) {
+            logGazeY.push(new_gaze_y)
+        }
 
         if (gaze_x > gazeLog.max_x) {
             gazeLog_temp.max_x = gaze_x
@@ -119,12 +130,10 @@ const MobileEyeTrack = () => {
         //continuing sending objet position
         setTimeout(function run() {
             // get the x and y coordinates of the labels and assign them
-            if (gaze_x && gaze_y) {
-                let new_gaze_x = gaze_x * SCREEN_WIDTH / window.innerWidth
-                let new_gaze_y = gaze_y * SCREEN_HEIGHT / window.innerHeight
-                const gazeObj = { gaze_x: new_gaze_x, gaze_y: new_gaze_y, page: 'mobile' }
-                socket.emit('gaze-position-change', gazeObj)
-            }
+            const gazeObj = { gaze_x: logGazeX, gaze_y: logGazeY, page: 'mobile' }
+            logGazeX = []
+            logGazeY = []
+            socket.emit('gaze-position-change', gazeObj)
             setTimeout(run, WINDOW_SIZE); // To continue sending object postion
         }, WINDOW_SIZE);
 

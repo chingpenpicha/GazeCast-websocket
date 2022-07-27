@@ -6,6 +6,8 @@ const licenseKey = process.env.SEESO_KEY
 let socket
 
 const Webcamera = () => {
+
+
   const firstRenderRef = useRef(true);
   const [question, setQuestion] = useState(-1)
   const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
@@ -13,6 +15,8 @@ const Webcamera = () => {
   const [gazeLog, setGazeLog] = useState({
     max_x: -1000, max_y: -1000, min_x: 2000, min_y: 2000
   })
+  let logGazeX = []
+  let logGazeY = []
   let gaze_x
   let gaze_y
 
@@ -27,9 +31,16 @@ const Webcamera = () => {
     if (!gaze_y) {
       console.log("Y_NAN")
     }
+
     gaze_x = gazeInfo.x
     gaze_y = gazeInfo.y
 
+    if (gaze_x) {
+      logGazeX.push(gaze_x)
+    }
+    if (gaze_y) {
+      logGazeY.push(gaze_y)
+    }
 
     if (gaze_x > gazeLog.max_x) {
       gazeLog_temp.max_x = gaze_x
@@ -108,10 +119,10 @@ const Webcamera = () => {
     //continuing sending objet position
     setTimeout(function run() {
       // get the x and y coordinates of the labels and assign them
-      if (gaze_x && gaze_y) {
-        const gazeObj = { gaze_x, gaze_y, page: 'webcam' }
-        socket.emit('gaze-position-change', gazeObj)
-      }
+      const gazeObj = { gaze_x: logGazeX, gaze_y: logGazeY, page: 'webcam' }
+      logGazeX = []
+      logGazeY = []
+      socket.emit('gaze-position-change', gazeObj)
       setTimeout(run, WINDOW_SIZE); // To continue sending object postion
     }, WINDOW_SIZE);
 

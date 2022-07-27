@@ -11,6 +11,7 @@ import { useRouter } from 'next/router'
 
 const WINDOW_SIZE = 2000 // 2 second
 const THRESHOLD = 0.8
+const SIZE_OF_ARR = 150
 
 const WEBCAMERA = 'WEBCAMERA'
 const MOBILE_WITH_HAND = 'MOBILE_WITH_HAND'
@@ -132,6 +133,7 @@ const EyeVote = (props) => {
     const logGazePosition_y = [];
     const logGazeTime = [];
 
+
     useEffect(() => {
         // for dev
         // if (firstRenderRef.current) {
@@ -159,7 +161,7 @@ const EyeVote = (props) => {
                 socket.on('update-gaze-position', obj => {
                     gaze_x = obj.gaze_x
                     gaze_y = obj.gaze_y
-                    console.log('x: ', gaze_x, '  y:', gaze_y)
+                    // console.log('x: ', gaze_x, '  y:', gaze_y)
                     if (question.current >= 0 && question.current <= 6 && !undoscreen.current) {
                         _calculateCorrelation()
                     }
@@ -174,13 +176,44 @@ const EyeVote = (props) => {
         }
         socketInitializer()
 
+
+
         //start log overall time
         start();
 
         console.log('w: ', window.innerWidth)
         console.log('h: ', window.innerHeight)
 
+        setTimeout(function run() {
+            // get the x and y coordinates of the labels and assign them
+
+            let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
+            let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
+            let answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
+
+            // Labels
+            // x and y coordinates of labels
+            let answerOne_x = answerOne_rect.left;
+            let answerOne_y = answerOne_rect.top;
+            let answerTwo_x = answerTwo_rect.left;
+            let answerTwo_y = answerTwo_rect.top;
+            let answerThree_x = answerThree_rect.left;
+            let answerThree_y = answerThree_rect.top;
+
+            logLabelPositionOne_x.push(answerOne_x)
+            logLabelPositionOne_y.push(answerOne_y)
+            logLabelPositionTwo_x.push(answerTwo_x)
+            logLabelPositionTwo_y.push(answerTwo_y)
+            logLabelPositionThree_x.push(answerThree_x)
+            logLabelPositionThree_y.push(answerThree_y)
+
+            setTimeout(run, WINDOW_SIZE / 60); // To continue sending object postion
+        }, WINDOW_SIZE / 60);
     }, [])
+
+    useEffect(() => {
+        conditionRef.current = condition
+    }, [condition])
 
     const handleAnswerRecived = () => {
         // Question page
@@ -250,137 +283,149 @@ const EyeVote = (props) => {
     // calculates Correlation
     function _calculateCorrelation() {
         //if gaze x and gaze y have value
-        if ((!undoscreen.current) && gaze_x && gaze_y && question.current >= 0) {
+        if ((!undoscreen.current) && question.current >= 0) {
             //check change ans
             let isChangeAns = false
 
-            let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
-            let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
-            let answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
-
-            // Labels
-            // x and y coordinates of labels
-            let answerOne_x = answerOne_rect.left;
-            let answerOne_y = answerOne_rect.top;
-            let answerTwo_x = answerTwo_rect.left;
-            let answerTwo_y = answerTwo_rect.top;
-            let answerThree_x = answerThree_rect.left;
-            let answerThree_y = answerThree_rect.top;
-
             // push gaze data into the arrays
-            logGazePosition_x.push(gaze_x)
-            logGazePosition_y.push(gaze_y)
+            logGazePosition_x.push(...gaze_x)
+            logGazePosition_y.push(...gaze_y)
             // push label positions into the arrays
-            logLabelPositionOne_x.push(answerOne_x)
-            logLabelPositionOne_y.push(answerOne_y)
-            logLabelPositionTwo_x.push(answerTwo_x)
-            logLabelPositionTwo_y.push(answerTwo_y)
-            logLabelPositionThree_x.push(answerThree_x)
-            logLabelPositionThree_y.push(answerThree_y)
             logGazeTime.push(Timestamp.now())
 
-            // calculate the correlation
-            let corAnswerOne_x = calculateCorrelation(logLabelPositionOne_x, logGazePosition_x);
-            let corAnswerOne_y = calculateCorrelation(logLabelPositionOne_y, logGazePosition_y);
-            let corAnswerTwo_x = calculateCorrelation(logLabelPositionTwo_x, logGazePosition_x);
-            let corAnswerTwo_y = calculateCorrelation(logLabelPositionTwo_y, logGazePosition_y);
-            let corAnswerThree_x = calculateCorrelation(logLabelPositionThree_x, logGazePosition_x);
-            let corAnswerThree_y = calculateCorrelation(logLabelPositionThree_y, logGazePosition_y);
+            console.log('before slice: ', logLabelPositionOne_x.length, logGazePosition_x.length)
+            if (logLabelPositionOne_x.length > SIZE_OF_ARR) {
+                logLabelPositionOne_x = logLabelPositionOne_x.slice(logLabelPositionOne_x.length - SIZE_OF_ARR)
+            }
+            if (logLabelPositionOne_y.length > SIZE_OF_ARR) {
+                logLabelPositionOne_y = logLabelPositionOne_y.slice(logLabelPositionOne_y.length - SIZE_OF_ARR)
+            }
+            if (logLabelPositionTwo_x.length > SIZE_OF_ARR) {
+                logLabelPositionTwo_x = logLabelPositionTwo_x.slice(logLabelPositionTwo_x.length - SIZE_OF_ARR)
+            }
+            if (logLabelPositionTwo_y.length > SIZE_OF_ARR) {
+                logLabelPositionTwo_y = logLabelPositionTwo_y.slice(logLabelPositionTwo_y.length - SIZE_OF_ARR)
+            }
+            if (logLabelPositionThree_x.length > SIZE_OF_ARR) {
+                logLabelPositionThree_x = logLabelPositionThree_x.slice(logLabelPositionThree_x.length - SIZE_OF_ARR)
+            }
+            if (logLabelPositionThree_y.length > SIZE_OF_ARR) {
+                logLabelPositionThree_y = logLabelPositionThree_y.slice(logLabelPositionThree_y.length - SIZE_OF_ARR)
+            }
+            if (logGazePosition_x.length > SIZE_OF_ARR) {
+                logGazePosition_x = logGazePosition_x.slice(logGazePosition_x.length - SIZE_OF_ARR)
+            }
+            if (logGazePosition_y.length > SIZE_OF_ARR) {
+                logGazePosition_y = logGazePosition_y.slice(logGazePosition_y.length - SIZE_OF_ARR)
+            }
 
-            // calculate correlation
-            let temp_corAnswerOne = corAnswerOne_x < corAnswerOne_y ? corAnswerOne_x : corAnswerOne_y;
-            let temp_corAnswerTwo = corAnswerTwo_x < corAnswerTwo_y ? corAnswerTwo_x : corAnswerTwo_y;
-            let temp_corAnswerThree = corAnswerThree_x < corAnswerThree_y ? corAnswerThree_x : corAnswerThree_y;
+            console.log('after slice: ', logLabelPositionOne_x.length, logGazePosition_x.length)
 
-            if (!(isNaN(temp_corAnswerOne) || isNaN(temp_corAnswerTwo) || isNaN(temp_corAnswerThree))) {
-                console.log(temp_corAnswerOne, temp_corAnswerTwo, temp_corAnswerThree)
-                const dataRef = collection(db, conditionRef.current)
-                setCorAnswerOne(isNaN(temp_corAnswerOne) ? corAnswerOne : temp_corAnswerOne)
-                setCorAnswerTwo(isNaN(temp_corAnswerTwo) ? corAnswerTwo : temp_corAnswerTwo)
-                setCorAnswerThree(isNaN(temp_corAnswerThree) ? corAnswerThree : temp_corAnswerThree)
-
-                const logData = {
-                    participantId: participantRef.current,
-                    questionNo: question.current,
-                    condition: conditionRef.current,
-                    gaze_x,
-                    gaze_y,
-                    timestamp: Timestamp.now(),
-                    timestamp_UNIX: Timestamp.now().toMillis(),
-                    obj_one_x: answerOne_x,
-                    obj_one_y: answerOne_y,
-                    obj_two_x: answerTwo_x,
-                    obj_two_y: answerTwo_y,
-                    obj_three_x: answerThree_x,
-                    obj_three_y: answerThree_y,
-                    cor_one: temp_corAnswerOne,
-                    cor_two: temp_corAnswerTwo,
-                    cor_three: temp_corAnswerThree,
-                    mode: question.current === 0 ? "TRAINING" : "REAL",
-                    target_to_select: CHOICE_TO_SELECT[questionSetNo.current][question.current],
-                }
-
-                //log end all questions
-                if (question.current === 6) {
-                    const end_time = Timestamp.now()
-                    logData.end_time = end_time
-                    logData.end_time_UNIX = end_time.toMillis()
-                    logData.interaction_time = end_time.toMillis - interactionTime.current
-                    logData.window_height = window.innerHeight
-                    logData.window_width = window.innerWidth
-
-                }
-
-                if ((temp_corAnswerOne >= THRESHOLD) && (temp_corAnswerOne < 1) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
-                    logData.selected_answer = ONE
-                    logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
-                    logData.selected_cor = temp_corAnswerOne
-                    logData.selected_at = Timestamp.now()
-                    logData.selected_at_UNIX = Timestamp.now().toMillis()
-                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
-                    isChangeAns = true
-                    answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'PINK' : 'BROWN'
-
-                } else if ((temp_corAnswerTwo >= THRESHOLD) && (temp_corAnswerTwo < 1) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
-                    logData.selected_answer = TWO
-                    logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'CORRECT' : "WRONG"
-                    logData.selected_cor = temp_corAnswerTwo
-                    logData.selected_at = Timestamp.now()
-                    logData.selected_at_UNIX = Timestamp.now().toMillis()
-                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
-                    isChangeAns = true
-                    answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'PINK' : 'BROWN'
-
-                } else if ((temp_corAnswerThree >= THRESHOLD) && (temp_corAnswerThree < 1) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
-                    logData.selected_answer = THREE
-                    logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'CORRECT' : "WRONG"
-                    logData.selected_cor = temp_corAnswerThree
-                    logData.selected_at = Timestamp.now()
-                    logData.selected_at_UNIX = Timestamp.now().toMillis()
-                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
-                    isChangeAns = true
-                    answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'PINK' : 'BROWN'
-
-                }
+            if (logGazePosition_x.length === SIZE_OF_ARR && logLabelPositionOne_x.length === SIZE_OF_ARR) {
+                // calculate the correlation
+                let corAnswerOne_x = calculateCorrelation(logLabelPositionOne_x, logGazePosition_x);
+                let corAnswerOne_y = calculateCorrelation(logLabelPositionOne_y, logGazePosition_y);
+                let corAnswerTwo_x = calculateCorrelation(logLabelPositionTwo_x, logGazePosition_x);
+                let corAnswerTwo_y = calculateCorrelation(logLabelPositionTwo_y, logGazePosition_y);
+                let corAnswerThree_x = calculateCorrelation(logLabelPositionThree_x, logGazePosition_x);
+                let corAnswerThree_y = calculateCorrelation(logLabelPositionThree_y, logGazePosition_y);
 
 
-                /// clear array : TIME OUT AFTER 40 seconds
-                if (logLabelPositionOne_x.length > 20) {
-                    logData.select_status = "TIME_OUT"
-                    logData.select_status = NOT_DETECT
-                    logData.selected_at = Timestamp.now()
-                    logData.selected_at_UNIX = Timestamp.now().toMillis()
-                    logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
-                    isChangeAns = true
-                    answerselected.current = NOT_DETECT
-                }
+                // calculate correlation
+                let temp_corAnswerOne = corAnswerOne_x < corAnswerOne_y ? corAnswerOne_x : corAnswerOne_y;
+                let temp_corAnswerTwo = corAnswerTwo_x < corAnswerTwo_y ? corAnswerTwo_x : corAnswerTwo_y;
+                let temp_corAnswerThree = corAnswerThree_x < corAnswerThree_y ? corAnswerThree_x : corAnswerThree_y;
 
-                // log data into firestore
-                addDoc(dataRef, logData);
+                if (!(isNaN(temp_corAnswerOne) || isNaN(temp_corAnswerTwo) || isNaN(temp_corAnswerThree))) {
+                    console.log(temp_corAnswerOne, temp_corAnswerTwo, temp_corAnswerThree)
+                    const dataRef = collection(db, conditionRef.current)
+                    setCorAnswerOne(isNaN(temp_corAnswerOne) ? corAnswerOne : temp_corAnswerOne)
+                    setCorAnswerTwo(isNaN(temp_corAnswerTwo) ? corAnswerTwo : temp_corAnswerTwo)
+                    setCorAnswerThree(isNaN(temp_corAnswerThree) ? corAnswerThree : temp_corAnswerThree)
 
-                if (isChangeAns) {
-                    undoscreen.current = true
-                    handleAnswerRecived()
+                    const logData = {
+                        participantId: participantRef.current,
+                        questionNo: question.current,
+                        condition: conditionRef.current,
+                        // gaze_x,
+                        // gaze_y,
+                        timestamp: Timestamp.now(),
+                        timestamp_UNIX: Timestamp.now().toMillis(),
+                        // obj_one_x: answerOne_x,
+                        // obj_one_y: answerOne_y,
+                        // obj_two_x: answerTwo_x,
+                        // obj_two_y: answerTwo_y,
+                        // obj_three_x: answerThree_x,
+                        // obj_three_y: answerThree_y,
+                        cor_one: temp_corAnswerOne,
+                        cor_two: temp_corAnswerTwo,
+                        cor_three: temp_corAnswerThree,
+                        mode: question.current === 0 ? "TRAINING" : "REAL",
+                        target_to_select: CHOICE_TO_SELECT[questionSetNo.current][question.current],
+                    }
+
+                    //log end all questions
+                    if (question.current === 6) {
+                        const end_time = Timestamp.now()
+                        logData.end_time = end_time
+                        logData.end_time_UNIX = end_time.toMillis()
+                        logData.interaction_time = end_time.toMillis - interactionTime.current
+                        logData.window_height = window.innerHeight
+                        logData.window_width = window.innerWidth
+
+                    }
+
+                    if ((temp_corAnswerOne >= THRESHOLD) && (temp_corAnswerOne < 1) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
+                        logData.selected_answer = ONE
+                        logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
+                        logData.selected_cor = temp_corAnswerOne
+                        logData.selected_at = Timestamp.now()
+                        logData.selected_at_UNIX = Timestamp.now().toMillis()
+                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                        isChangeAns = true
+                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'PINK' : 'BROWN'
+
+                    } else if ((temp_corAnswerTwo >= THRESHOLD) && (temp_corAnswerTwo < 1) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
+                        logData.selected_answer = TWO
+                        logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'CORRECT' : "WRONG"
+                        logData.selected_cor = temp_corAnswerTwo
+                        logData.selected_at = Timestamp.now()
+                        logData.selected_at_UNIX = Timestamp.now().toMillis()
+                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                        isChangeAns = true
+                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'PINK' : 'BROWN'
+
+                    } else if ((temp_corAnswerThree >= THRESHOLD) && (temp_corAnswerThree < 1) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
+                        logData.selected_answer = THREE
+                        logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'CORRECT' : "WRONG"
+                        logData.selected_cor = temp_corAnswerThree
+                        logData.selected_at = Timestamp.now()
+                        logData.selected_at_UNIX = Timestamp.now().toMillis()
+                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                        isChangeAns = true
+                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'PINK' : 'BROWN'
+
+                    }
+
+
+                    /// clear array : TIME OUT AFTER 40 seconds
+                    // if (logLabelPositionOne_x.length > 20) {
+                    //     logData.select_status = "TIME_OUT"
+                    //     logData.select_status = NOT_DETECT
+                    //     logData.selected_at = Timestamp.now()
+                    //     logData.selected_at_UNIX = Timestamp.now().toMillis()
+                    //     logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                    //     isChangeAns = true
+                    //     answerselected.current = NOT_DETECT
+                    // }
+
+                    // log data into firestore
+                    addDoc(dataRef, logData);
+
+                    if (isChangeAns) {
+                        undoscreen.current = true
+                        handleAnswerRecived()
+                    }
                 }
             }
         }
@@ -436,6 +481,9 @@ const EyeVote = (props) => {
                         </>
                     }
                     <br />
+                    <label className='answerOne' id="answerOne"> </label>
+                    <label className='answerTwo' id="answerTwo"> </label>
+                    <label className='answerThree' id="answerThree"> </label>
                     {condition === WEBCAMERA && <div className="boxCenter">
                         <button className='button' onClick={() => {
                             if (condition) {
@@ -447,8 +495,10 @@ const EyeVote = (props) => {
                         }}>
                             Next
                         </button>
+
                     </div>
                     }
+
                 </div >
             </div >
         );
@@ -460,7 +510,9 @@ const EyeVote = (props) => {
             <div className='Eyevote'>
                 <div className="descriptionBox boxCenter">
                     <h1 className='titleEyeVote'>{props.header}</h1>
-
+                    <label className='answerOne' id="answerOne"> </label>
+                    <label className='answerTwo' id="answerTwo"> </label>
+                    <label className='answerThree' id="answerThree"> </label>
                     {/* < className='instructions'>Follow the circle by following its movement with your gaze.</h4> */}
                     <p className='instructions'>Find and follow the <span className='pink'>PINK</span> potato moving on the screen</p>
                     <Image
@@ -494,6 +546,7 @@ const EyeVote = (props) => {
         const one = props.one === 'pink'
         const two = props.two === 'pink'
         const three = props.three === 'pink'
+
         return (
             <div className='Eyevote'>
                 <h1 className='question' id="questionPrompt">Find the <span className='pink'>PINK</span> potato! {props.prompt}</h1>
@@ -536,6 +589,9 @@ const EyeVote = (props) => {
                         </h1>}
 
                     <p> The next task will be shown in 5 seconds </p>
+                    <label className='answerOne' id="answerOne"> </label>
+                    <label className='answerTwo' id="answerTwo"> </label>
+                    <label className='answerThree' id="answerThree"> </label>
                 </div>
             </div>
         );
@@ -545,6 +601,9 @@ const EyeVote = (props) => {
         return (
             <div className='Eyevote'>
                 <div className="descriptionBox">
+                    <label className='answerOne' id="answerOne"> </label>
+                    <label className='answerTwo' id="answerTwo"> </label>
+                    <label className='answerThree' id="answerThree"> </label>
                     <h4 className='instructions'>You have successfully completed this task.</h4>
                     {/* <h4 className='instructions'>We will now continue with the accuracy test.</h4> */}
                     {/* <p className='instructions'>Please look at the black center inside the white circles showing up on the screen.</p> */}
