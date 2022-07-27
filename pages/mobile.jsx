@@ -5,6 +5,10 @@ const WINDOW_SIZE = 2000 // 2 second
 const licenseKey = process.env.SEESO_KEY
 let socket
 
+const SCREEN_WIDTH = 1920
+const SCREEN_HEIGHT = 1001
+// const MOBILE_WIDTH
+
 const MobileEyeTrack = () => {
     const firstRenderRef = useRef(true);
     const [question, setQuestion] = useState(-1)
@@ -116,7 +120,9 @@ const MobileEyeTrack = () => {
         setTimeout(function run() {
             // get the x and y coordinates of the labels and assign them
             if (gaze_x && gaze_y) {
-                const gazeObj = { gaze_x, gaze_y, page: 'mobile' }
+                let new_gaze_x = gaze_x * SCREEN_WIDTH / window.innerWidth
+                let new_gaze_y = gaze_y * SCREEN_HEIGHT / window.innerHeight
+                const gazeObj = { gaze_x: new_gaze_x, gaze_y: new_gaze_y, page: 'mobile' }
                 socket.emit('gaze-position-change', gazeObj)
             }
             setTimeout(run, WINDOW_SIZE); // To continue sending object postion
