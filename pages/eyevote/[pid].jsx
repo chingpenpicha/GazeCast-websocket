@@ -286,6 +286,29 @@ const EyeVote = (props) => {
 
     }
 
+    const handleCorrelationIsDetected = (ans, corData) => {
+        let log = {}
+        log.selected_answer = ans
+        log.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ans ? 'CORRECT' : "WRONG"
+        log.selected_cor = corData
+        log.selected_at = Timestamp.now()
+        log.selected_at_UNIX = Timestamp.now().toMillis()
+        log.duration = log.selected_at_UNIX - durationPerQuestion.current
+        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ans ? 'PINK' : 'BROWN'
+        console.log('ANS is : ', log.selected_answer)
+        //log end all questions
+        if (question.current === 6) {
+            const end_time = Timestamp.now()
+            log.end_time = end_time
+            log.end_time_UNIX = end_time.toMillis()
+            log.interaction_time = end_time.toMillis() - interactionTime.current
+            log.window_height = window.innerHeight
+            log.window_width = window.innerWidth
+        }
+
+        return log
+    }
+
     // calculates Correlation
     function _calculateCorrelation() {
 
@@ -364,61 +387,26 @@ const EyeVote = (props) => {
                         target_to_select: CHOICE_TO_SELECT[questionSetNo.current][question.current],
                     }
 
-                    //log end all questions
-                    if (question.current === 6) {
-                        const end_time = Timestamp.now()
-                        logData.end_time = end_time
-                        logData.end_time_UNIX = end_time.toMillis()
-                        logData.interaction_time = end_time.toMillis - interactionTime.current
-                        logData.window_height = window.innerHeight
-                        logData.window_width = window.innerWidth
-
-                    }
-
                     if ((temp_corAnswerOne >= THRESHOLD) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
-                        logData.selected_answer = ONE
-                        logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'CORRECT' : "WRONG"
-                        logData.selected_cor = temp_corAnswerOne
-                        logData.selected_at = Timestamp.now()
-                        logData.selected_at_UNIX = Timestamp.now().toMillis()
-                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                        logData = { ...logData, ...handleCorrelationIsDetected(ONE, temp_corAnswerOne) }
                         isChangeAns = true
-                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ONE ? 'PINK' : 'BROWN'
-                        console.log('ANS is : ', logData.selected_answer)
 
                     } else if ((temp_corAnswerTwo >= THRESHOLD) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
-                        logData.selected_answer = TWO
-                        logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'CORRECT' : "WRONG"
-                        logData.selected_cor = temp_corAnswerTwo
-                        logData.selected_at = Timestamp.now()
-                        logData.selected_at_UNIX = Timestamp.now().toMillis()
-                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                        logData = { ...logData, ...handleCorrelationIsDetected(TWO, temp_corAnswerTwo) }
                         isChangeAns = true
-                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === TWO ? 'PINK' : 'BROWN'
-                        console.log('ANS is : ', logData.selected_answer)
 
                     } else if ((temp_corAnswerThree >= THRESHOLD) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
-                        logData.selected_answer = THREE
-                        logData.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'CORRECT' : "WRONG"
-                        logData.selected_cor = temp_corAnswerThree
-                        logData.selected_at = Timestamp.now()
-                        logData.selected_at_UNIX = Timestamp.now().toMillis()
-                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
+                        logData = { ...logData, ...handleCorrelationIsDetected(THREE, temp_corAnswerThree) }
                         isChangeAns = true
-                        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === THREE ? 'PINK' : 'BROWN'
-                        console.log('ANS is : ', logData.selected_answer)
+
                     }
 
 
                     /// clear array : TIME OUT AFTER 30 seconds
                     if (logGazeTime.length > 30) {
-                        logData.select_status = "TIME_OUT"
-                        logData.select_status = NOT_DETECT
-                        logData.selected_at = Timestamp.now()
-                        logData.selected_at_UNIX = Timestamp.now().toMillis()
-                        logData.duration = logData.selected_at_UNIX - durationPerQuestion.current
-                        isChangeAns = true
+                        logData = { ...logData, ...handleCorrelationIsDetected(NOT_DETECT, NaN) }
                         answerselected.current = NOT_DETECT
+                        isChangeAns = true
                     }
 
                     // log data into firestore
@@ -444,13 +432,17 @@ const EyeVote = (props) => {
         logGazePosition_x.length = 0;
         logGazePosition_y.length = 0;
         logGazeTime.length = 0;
-        // durationPerQuestion = 0;
     }
 
     function sleep(duration) {
         return new Promise((resolve) => {
             setTimeout(resolve, duration)
         })
+    }
+
+    const handleChangeCondition = (cond) => {
+        setCondition(cond);
+        conditionRef.current = WEBCAMERA
     }
 
     // First screen 
@@ -463,19 +455,32 @@ const EyeVote = (props) => {
                     <p className='question_title dimgray'>There will be one trial round, followed by six rounds of experimentation.</p>
                     <br />
                     <p className='question_title dimgray'>Choose Eye-tracker *</p>
-                    <label className='dimgray radio_op'><input type="radio" value={WEBCAMERA} name="condition" checked={condition === WEBCAMERA} onChange={(e) => {
-                        setCondition(WEBCAMERA);
-                        conditionRef.current = WEBCAMERA
-                    }} /> Web camera</label> <p />
-                    <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_STAND} name="condition" checked={condition === MOBILE_WITH_STAND} onChange={(e) => {
-                        setCondition(MOBILE_WITH_STAND);
-                        conditionRef.current = MOBILE_WITH_STAND
-                    }} /> Mobile with fixed stand</label><p />
-                    <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_HAND} name="condition" checked={condition === MOBILE_WITH_HAND} onChange={(e) => {
-                        setCondition(MOBILE_WITH_HAND);
-                        conditionRef.current = MOBILE_WITH_HAND
-                    }} /> Mobile with hand</label><p />
-                    {/* <h4 className='instructions marginTop'>The study will start with a calibration.</h4> */}
+                    <label className='dimgray radio_op'>
+                        <input type="radio"
+                            value={WEBCAMERA}
+                            name="condition"
+                            checked={condition === WEBCAMERA}
+                            onChange={handleChangeCondition(WEBCAMERA)} />
+                        Web camera
+                    </label>
+                    <p />
+                    <label className='dimgray radio_op'>
+                        <input type="radio"
+                            value={MOBILE_WITH_STAND}
+                            name="condition"
+                            checked={condition === MOBILE_WITH_STAND}
+                            onChange={handleChangeCondition(MOBILE_WITH_STAND)} />
+                        Mobile with fixed stand</label>
+                    <p />
+                    <label className='dimgray radio_op'>
+                        <input type="radio"
+                            value={MOBILE_WITH_HAND}
+                            name="condition"
+                            checked={condition === MOBILE_WITH_HAND}
+                            onChange={handleChangeCondition(MOBILE_WITH_HAND)} />
+                        Mobile with hand
+                    </label>
+                    <p />
 
                     <br />
                     <label className='answerOne' id="answerOne"> </label>
