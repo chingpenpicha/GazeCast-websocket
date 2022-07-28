@@ -154,7 +154,6 @@ const EyeVote = (props) => {
                     console.log('update-question', msg)
                     // if (condition && pid) {
                     // conditionRef.current = condition
-                    // participantRef.current = pid
                     // }
                     nextQuestion()
                 })
@@ -259,6 +258,8 @@ const EyeVote = (props) => {
     // Function on clicking Start button
     function start() {
         // add start timestamp
+        participantRef.current = pid
+
         const dataRef = collection(db, conditionRef.current)
         const start_time = Timestamp.now()
         const logData = {
@@ -440,11 +441,6 @@ const EyeVote = (props) => {
         })
     }
 
-    const handleChangeCondition = (cond) => {
-        setCondition(cond);
-        conditionRef.current = WEBCAMERA
-    }
-
     // First screen 
     const StartScreen = (props) => {
         return (
@@ -460,7 +456,7 @@ const EyeVote = (props) => {
                             value={WEBCAMERA}
                             name="condition"
                             checked={condition === WEBCAMERA}
-                            onChange={() => handleChangeCondition(WEBCAMERA)} />
+                            onChange={() => setCondition(WEBCAMERA)} />
                         Web camera
                     </label>
                     <p />
@@ -469,7 +465,7 @@ const EyeVote = (props) => {
                             value={MOBILE_WITH_STAND}
                             name="condition"
                             checked={condition === MOBILE_WITH_STAND}
-                            onChange={() => handleChangeCondition(MOBILE_WITH_STAND)} />
+                            onChange={() => setCondition(MOBILE_WITH_STAND)} />
                         Mobile with fixed stand</label>
                     <p />
                     <label className='dimgray radio_op'>
@@ -477,7 +473,7 @@ const EyeVote = (props) => {
                             value={MOBILE_WITH_HAND}
                             name="condition"
                             checked={condition === MOBILE_WITH_HAND}
-                            onChange={() => handleChangeCondition(MOBILE_WITH_HAND)} />
+                            onChange={() => setCondition(MOBILE_WITH_HAND)} />
                         Mobile with hand
                     </label>
                     <p />
