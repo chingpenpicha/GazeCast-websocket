@@ -160,7 +160,6 @@ const EyeVote = (props) => {
                 socket.on('update-gaze-position', obj => {
                     gaze_x = obj.gaze_x
                     gaze_y = obj.gaze_y
-                    // console.log('x: ', gaze_x, '  y:', gaze_y)
 
                     // if (document.getElementById('answerOne')) {
                     let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
@@ -340,8 +339,6 @@ const EyeVote = (props) => {
             if (logGazePosition_y.length > SIZE_OF_ARR) {
                 logGazePosition_y = logGazePosition_y.slice(logGazePosition_y.length - SIZE_OF_ARR)
             }
-
-            console.log(logGazePosition_x.length, logLabelPositionOne_x.length)
 
             if (logGazePosition_x.length === SIZE_OF_ARR && logLabelPositionOne_x.length === SIZE_OF_ARR) {
                 // calculate the correlation
