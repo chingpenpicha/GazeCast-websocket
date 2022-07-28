@@ -253,34 +253,34 @@ ol>li:before {
 }
 
 @keyframes zigzag {
-    0% {
+    100% {
         top: 70vh;
-        left: 75vw
-    }
-
-    20% {
-        top: 55vh;
-        left: 65vw
-    }
-
-    40% {
-        top: 70vh;
-        left: 55vw
-    }
-
-    60% {
-        top: 55vh;
-        left: 45vw
+        left: 80vw
     }
 
     80% {
-        top: 70vh;
-        left: 35vw
+        top: 55vh;
+        left: 68vw
     }
 
-    100% {
+    60% {
+        top: 70vh;
+        left: 56vw
+    }
+
+    40% {
         top: 55vh;
-        left: 25vw
+        left: 44vw
+    }
+
+    20% {
+        top: 70vh;
+        left: 32vw
+    }
+
+    0% {
+        top: 55vh;
+        left: 20vw
     }
 }
 
