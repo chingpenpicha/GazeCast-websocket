@@ -11,6 +11,7 @@ const Webcamera = () => {
   const firstRenderRef = useRef(true);
   const [question, setQuestion] = useState(-1)
   const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
+  const [seesoConnected, setSeesoConnected] = useState(false)
   const [windowSize, setWindowSize] = useState({ w: 0, h: 0 })
   const [gazeLog, setGazeLog] = useState({
     max_x: -1000, max_y: -1000, min_x: 2000, min_y: 2000
@@ -24,7 +25,9 @@ const Webcamera = () => {
   function onGaze(gazeInfo) {
     // do something with gaze info.
     if (TrackingState && gazeInfo.trackingState === TrackingState.SUCCESS) {
-
+      if (!seesoConnected) {
+        setSeesoConnected(true)
+      }
 
       let gazeLog_temp = gazeLog
       setGazePosition({ ...gazeInfo })
@@ -119,7 +122,6 @@ const Webcamera = () => {
         seeSo.setFaceDistance(45);
         // seeSo.setCameraPosition(window.outerWidth / 2, true);
         seeSo.startTracking(onGaze, onDebug)
-        socket.emit('send-eyetracker-connection', true)
       }, () => { alert('init SeeSo failed') })
 
       setWindowSize({ w: window.innerWidth, h: window.innerHeight })
@@ -139,6 +141,12 @@ const Webcamera = () => {
 
   }, [])
 
+  useEffect(() => {
+    if (seesoConnected) {
+      socket.emit('send-eyetracker-connection', true)
+    }
+  }, [seesoConnected])
+
   if (question > 6) {
     return (
       <div className='alignCenter'>
@@ -154,11 +162,14 @@ const Webcamera = () => {
   return (
     <div className='alignCenter'>
       <h1>Gaze positions</h1>
-      <p>{`current question : ${question}`}</p>
-      {question < 1 && <p>
-        Connected with the display!
-      </p>}
+      {(question < 0 && seesoConnected) && <>
+        <h4>
+          Connected with the display!
+        </h4>
+        <button className="start-button" onClick={sendNext}>{question === -1 ? "Start" : "Next"}</button>
+      </>}
       {(question > 0 && question <= 6) && <div>
+        <p>{`current question : ${question}`}</p>
         Find the <span className='pink'>PINK</span> potato!
       </div>}
       <h4>{`gazeX : ${gazePosition.x}`}</h4>

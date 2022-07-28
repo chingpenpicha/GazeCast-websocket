@@ -12,6 +12,7 @@ const SCREEN_HEIGHT = 1001
 const MobileEyeTrack = () => {
     const firstRenderRef = useRef(true);
     const [question, setQuestion] = useState(-2)
+    const [seesoConnected, setSeesoConnected] = useState(false)
     const [windowSize, setWindowSize] = useState({ w: 0, h: 0 })
     const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
     const [gazeLog, setGazeLog] = useState({
@@ -27,6 +28,9 @@ const MobileEyeTrack = () => {
         // do something with gaze info.
         // console.log('gazeInfo', gazeInfo.x, gazeInfo.y)
         if (TrackingState && gazeInfo.trackingState === TrackingState.SUCCESS) {
+            if (!seesoConnected) {
+                setSeesoConnected(true)
+            }
             let gazeLog_temp = gazeLog
             setGazePosition({ ...gazeInfo })
 
@@ -132,7 +136,6 @@ const MobileEyeTrack = () => {
                 // console.log('w: ', window.outerWidth)
                 // console.log('h: ', window.outerHeight)
                 seeSo.startTracking(onGaze, onDebug)
-                socket.emit('send-eyetracker-connection', true)
             }, () => { alert('init SeeSo failed') })
         }
 
@@ -153,6 +156,12 @@ const MobileEyeTrack = () => {
 
     }, [])
 
+    useEffect(() => {
+        if (seesoConnected) {
+            socket.emit('send-eyetracker-connection', true)
+        }
+    }, [seesoConnected])
+
     if (question > 6) {
         return (
             <div className='alignCenter'>
@@ -166,7 +175,7 @@ const MobileEyeTrack = () => {
     return (
         <div className='alignCenter'>
             <h1>Welcome to GazeCast experiment</h1>
-            {question < 0 && <>
+            {(question < 0 && seesoConnected) && <>
                 <h4>
                     Connected with the display!
                 </h4>
