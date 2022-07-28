@@ -108,7 +108,6 @@ const EyeVote = (props) => {
     const [condition, setCondition] = useState(WEBCAMERA)
 
     const logselected_gaze = useRef({})
-    const calibrationDone = useRef(false)
     const firstRenderRef = useRef(true);
 
     // x and y coordinates of gaze
@@ -216,18 +215,17 @@ const EyeVote = (props) => {
 
     useEffect(() => {
         conditionRef.current = condition
+        participantRef.current = pid
     }, [condition])
 
     const handleAnswerRecived = () => {
         // Question page
         setUndo('1')
         setTimeout(function () {
-            //console.log("Timeout over")
             undoscreen.current = false
             setUndo(0)
             nextQuestion()
             empty()
-
         }, 5000);
     }
 
@@ -246,7 +244,6 @@ const EyeVote = (props) => {
         else if (question.current >= 0 && question.current <= 6) {
             return (QuestionScreen(questionArray[questionSetNo.current][question.current]));
         } else if (question.current > 6) {
-            calibrationDone.current = false
             return (
                 <StudyEnd />
             )
@@ -258,7 +255,7 @@ const EyeVote = (props) => {
     // Function on clicking Start button
     function start() {
         // add start timestamp
-        participantRef.current = pid
+        // participantRef.current = pid
 
         const dataRef = collection(db, conditionRef.current)
         const start_time = Timestamp.now()
@@ -287,15 +284,15 @@ const EyeVote = (props) => {
 
     }
 
-    const handleCorrelationIsDetected = (ans, corData) => {
+    const handleCorrelationIsDetected = (ans, corData, target_to_select) => {
         let log = {}
         log.selected_answer = ans
-        log.select_status = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ans ? 'CORRECT' : "WRONG"
+        log.select_status = target_to_select === ans ? 'CORRECT' : "WRONG"
         log.selected_cor = corData
         log.selected_at = Timestamp.now()
         log.selected_at_UNIX = Timestamp.now().toMillis()
         log.duration = log.selected_at_UNIX - durationPerQuestion.current
-        answerselected.current = CHOICE_TO_SELECT[questionSetNo.current][question.current] === ans ? 'PINK' : 'BROWN'
+        answerselected.current = target_to_select === ans ? 'PINK' : 'BROWN'
         console.log('ANS is : ', log.selected_answer)
         //log end all questions
         if (question.current === 6) {
@@ -367,9 +364,12 @@ const EyeVote = (props) => {
                     setCorAnswerTwo(isNaN(temp_corAnswerTwo) ? corAnswerTwo : temp_corAnswerTwo)
                     setCorAnswerThree(isNaN(temp_corAnswerThree) ? corAnswerThree : temp_corAnswerThree)
 
+                    const questionNo = question.current
+                    const target_to_select = CHOICE_TO_SELECT[questionSetNo.current][questionNo]
+
                     const logData = {
                         participantId: participantRef.current,
-                        questionNo: question.current,
+                        questionNo,
                         condition: conditionRef.current,
                         gaze_x,
                         gaze_y,
@@ -384,27 +384,25 @@ const EyeVote = (props) => {
                         cor_one: temp_corAnswerOne,
                         cor_two: temp_corAnswerTwo,
                         cor_three: temp_corAnswerThree,
-                        mode: question.current === 0 ? "TRAINING" : "REAL",
-                        target_to_select: CHOICE_TO_SELECT[questionSetNo.current][question.current],
+                        mode: questionNo === 0 ? "TRAINING" : "REAL",
+                        target_to_select,
                     }
 
                     if ((temp_corAnswerOne >= THRESHOLD) && (temp_corAnswerOne > temp_corAnswerTwo) && (temp_corAnswerOne > temp_corAnswerThree)) {
-                        logData = { ...logData, ...handleCorrelationIsDetected(ONE, temp_corAnswerOne) }
+                        logData = { ...logData, ...handleCorrelationIsDetected(ONE, temp_corAnswerOne, target_to_select) }
                         isChangeAns = true
 
                     } else if ((temp_corAnswerTwo >= THRESHOLD) && (temp_corAnswerTwo > temp_corAnswerOne) && (temp_corAnswerTwo > temp_corAnswerThree)) {
-                        logData = { ...logData, ...handleCorrelationIsDetected(TWO, temp_corAnswerTwo) }
+                        logData = { ...logData, ...handleCorrelationIsDetected(TWO, temp_corAnswerTwo, target_to_select) }
                         isChangeAns = true
 
                     } else if ((temp_corAnswerThree >= THRESHOLD) && (temp_corAnswerThree > temp_corAnswerOne) && (temp_corAnswerThree > temp_corAnswerTwo)) {
-                        logData = { ...logData, ...handleCorrelationIsDetected(THREE, temp_corAnswerThree) }
+                        logData = { ...logData, ...handleCorrelationIsDetected(THREE, temp_corAnswerThree, target_to_select) }
                         isChangeAns = true
-
                     }
 
-
                     /// clear array : TIME OUT AFTER 30 seconds
-                    if (logGazeTime.length > 30) {
+                    if (!isChangeAns && logGazeTime.length > 30) {
                         logData = { ...logData, ...handleCorrelationIsDetected(NOT_DETECT, NaN) }
                         answerselected.current = NOT_DETECT
                         isChangeAns = true
@@ -539,7 +537,7 @@ const EyeVote = (props) => {
                     }
                     {(eyetrackerConnected && condition === WEBCAMERA) && <div className="boxCenter">
                         <button className='eyevotebutton marginTop' onClick={() => {
-                            nextQuestion(); calibrationDone.current = true;
+                            nextQuestion();
                         }}>
                             Start
                         </button>
@@ -599,9 +597,6 @@ const EyeVote = (props) => {
                         </h1>}
 
                     <p> The next task will be shown in 5 seconds </p>
-                    <label className='answerOne' id="answerOne"> </label>
-                    <label className='answerTwo' id="answerTwo"> </label>
-                    <label className='answerThree' id="answerThree"> </label>
                 </div>
             </div>
         );
@@ -611,12 +606,8 @@ const EyeVote = (props) => {
         return (
             <div className='Eyevote'>
                 <div className="descriptionBox">
-                    <label className='answerOne' id="answerOne"> </label>
-                    <label className='answerTwo' id="answerTwo"> </label>
-                    <label className='answerThree' id="answerThree"> </label>
                     <h4 className='instructions'>You have successfully completed this task.</h4>
-                    {/* <h4 className='instructions'>We will now continue with the accuracy test.</h4> */}
-                    {/* <p className='instructions'>Please look at the black center inside the white circles showing up on the screen.</p> */}
+                    <h4 className='instructions'>Thank you!</h4>
                     <div className="boxCenter">
                         <button className='eyevotebutton marginTop' onClick={() => { nextQuestion(); }}>
                             Okay
