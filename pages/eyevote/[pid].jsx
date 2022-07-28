@@ -107,7 +107,6 @@ const EyeVote = (props) => {
     // State for Question undo
     const [condition, setCondition] = useState(WEBCAMERA)
 
-    const logselected_gaze = useRef({})
     const firstRenderRef = useRef(true);
 
     // x and y coordinates of gaze
@@ -161,32 +160,32 @@ const EyeVote = (props) => {
                     gaze_x = obj.gaze_x
                     gaze_y = obj.gaze_y
 
-                    // if (document.getElementById('answerOne')) {
-                    let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
-                    let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
-                    let answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
+                    if (document.getElementById('answerOne')) {
+                        let answerOne_rect = document.getElementById('answerOne').getBoundingClientRect();
+                        let answerTwo_rect = document.getElementById('answerTwo').getBoundingClientRect();
+                        let answerThree_rect = document.getElementById('answerThree').getBoundingClientRect();
 
-                    // Labels
-                    // x and y coordinates of labels
-                    let answerOne_x = answerOne_rect.left;
-                    let answerOne_y = answerOne_rect.top;
-                    let answerTwo_x = answerTwo_rect.left;
-                    let answerTwo_y = answerTwo_rect.top;
-                    let answerThree_x = answerThree_rect.left;
-                    let answerThree_y = answerThree_rect.top;
+                        // Labels
+                        // x and y coordinates of labels
+                        let answerOne_x = answerOne_rect.left;
+                        let answerOne_y = answerOne_rect.top;
+                        let answerTwo_x = answerTwo_rect.left;
+                        let answerTwo_y = answerTwo_rect.top;
+                        let answerThree_x = answerThree_rect.left;
+                        let answerThree_y = answerThree_rect.top;
 
-                    // push gaze data into the arrays
-                    logGazePosition_x.push(gaze_x)
-                    logGazePosition_y.push(gaze_y)
-                    // push label positions into the arrays
+                        // push gaze data into the arrays
+                        logGazePosition_x.push(gaze_x)
+                        logGazePosition_y.push(gaze_y)
+                        // push label positions into the arrays
 
-                    logLabelPositionOne_x.push(answerOne_x)
-                    logLabelPositionOne_y.push(answerOne_y)
-                    logLabelPositionTwo_x.push(answerTwo_x)
-                    logLabelPositionTwo_y.push(answerTwo_y)
-                    logLabelPositionThree_x.push(answerThree_x)
-                    logLabelPositionThree_y.push(answerThree_y)
-
+                        logLabelPositionOne_x.push(answerOne_x)
+                        logLabelPositionOne_y.push(answerOne_y)
+                        logLabelPositionTwo_x.push(answerTwo_x)
+                        logLabelPositionTwo_y.push(answerTwo_y)
+                        logLabelPositionThree_x.push(answerThree_x)
+                        logLabelPositionThree_y.push(answerThree_y)
+                    }
                 })
 
                 socket.on('update-eyetracker-connection', msg => {
@@ -595,9 +594,7 @@ const EyeVote = (props) => {
                         </h1>}
 
                     <p> The next task will be shown in 5 seconds </p>
-                    <label className='answerOne' id="answerOne"> </label>
-                    <label className='answerTwo' id="answerTwo"> </label>
-                    <label className='answerThree' id="answerThree"> </label>
+
                 </div>
             </div>
         );
