@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import io from 'socket.io-client'
 
-const WINDOW_SIZE = 1000 // 1 second
 const licenseKey = process.env.SEESO_KEY
 let socket
 
@@ -57,11 +56,10 @@ const Webcamera = () => {
   }
 
   useEffect(() => {
-    // for dev
-    // protect double call 
+    // // uncomment to protect dev double call
     // if (firstRenderRef.current) {
-    //   firstRenderRef.current = false;
-    //   return;
+    //     firstRenderRef.current = false;
+    //     return;
     // }
 
     const socketInitializer = async () => {
@@ -107,22 +105,11 @@ const Webcamera = () => {
     }
 
     initSeeSo()
-
-    //continuing sending objet position
-    // setTimeout(function run() {
-    //   // get the x and y coordinates of the labels and assign them
-    //   const gazeObj = { gaze_x: logGazeX, gaze_y: logGazeY, page: 'webcam' }
-    //   logGazeX = []
-    //   logGazeY = []
-    //   socket.emit('gaze-position-change', gazeObj)
-    //   setTimeout(run, WINDOW_SIZE); // To continue sending object postion
-    // }, WINDOW_SIZE);
-
   }, [])
 
   useEffect(() => {
     if (seesoConnected) {
-      socket.emit('send-eyetracker-connection', true)
+      socket.emit('send-eyetracker-connection', { w: windowSize.w, h: windowSize.h })
     }
   }, [seesoConnected])
 
@@ -144,7 +131,7 @@ const Webcamera = () => {
         <h4>
           Connected with the display!
         </h4>
-        <button className="start-button" onClick={sendNext}>{question === -1 ? "Start" : "Next"}</button>
+        <button className="start-button" onClick={sendNext}>Start</button>
       </>}
       {(question > 0 && question <= 6) && <div>
         <p>{`current question : ${question}`}</p>
