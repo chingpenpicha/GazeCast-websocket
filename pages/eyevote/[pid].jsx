@@ -59,7 +59,7 @@ const EyeVote = () => {
     const questionObj = useRef({})
     const choiceToSelect = useRef({})
 
-    const [eyetrackSize, setEyetrackSize] = useState({ w: 0, h: 0 })
+    const eyetrackSize = useRef({ w: 0, h: 0 })
     const [eyetrackerConnected, setEyetrackerConnected] = useState(false)
 
     // set condition of the experiment
@@ -145,7 +145,7 @@ const EyeVote = () => {
                 socket.on('update-eyetracker-connection', msg => {
                     console.log('Connection received with size: ', msg)
                     setEyetrackerConnected(true)
-                    setEyetrackSize(msg)
+                    eyetrackSize.current = msg
                 })
             }
 
@@ -299,8 +299,8 @@ const EyeVote = () => {
             log.interaction_time = end_time.toMillis() - interactionTime.current
             log.window_height = window.innerHeight
             log.window_width = window.innerWidth
-            log.eyetrack_height = eyetrackSize.h
-            log.eyetrack_width = eyetrackSize.w
+            log.eyetrack_height = eyetrackSize.current.h
+            log.eyetrack_width = eyetrackSize.current.w
         }
 
         return log
