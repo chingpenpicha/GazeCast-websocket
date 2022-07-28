@@ -210,7 +210,7 @@ ol>li:before {
     border-radius: 3vh;
     top: 35vh;
     left: 15vw;
-    animation: zigzag 10s linear infinite;
+    animation: zigzag 9s linear infinite;
     animation-direction: alternate;
 }
 
@@ -244,11 +244,11 @@ ol>li:before {
 
 @keyframes circular {
     from {
-        transform: rotate(0deg) translateX(9vw) rotate(0deg);
+        transform: rotate(0deg) translateX(8vw) rotate(0deg);
     }
 
     to {
-        transform: rotate(360deg) translateX(9vw) rotate(-360deg);
+        transform: rotate(360deg) translateX(8vw) rotate(-360deg);
     }
 }
 

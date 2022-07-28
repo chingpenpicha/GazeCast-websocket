@@ -11,7 +11,7 @@ import { useRouter } from 'next/router'
 
 const WINDOW_SIZE = 1000 // 1 second
 const THRESHOLD = 0.8
-const SIZE_OF_ARR = 30
+const SIZE_OF_ARR = 60
 
 const WEBCAMERA = 'WEBCAMERA'
 const MOBILE_WITH_HAND = 'MOBILE_WITH_HAND'
@@ -598,6 +598,9 @@ const EyeVote = (props) => {
                         </h1>}
 
                     <p> The next task will be shown in 5 seconds </p>
+                    <label className='answerOne' id="answerOne"> </label>
+                    <label className='answerTwo' id="answerTwo"> </label>
+                    <label className='answerThree' id="answerThree"> </label>
                 </div>
             </div>
         );
