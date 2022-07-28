@@ -259,27 +259,19 @@ const EyeVote = (props) => {
     // Function on clicking Start button
     function start() {
         // add start timestamp
-        if (condition && pid) {
-            const dataRef = doc(db, conditionRef.current, participantRef.current)
-            const start_time = Timestamp.now()
-            // const logData = {
-            //     start_time,
-            //     timestamp: start_time,
-            //     start_time_UNIX: start_time.toMillis(),
-            //     timestamp_UNIX: start_time.toMillis(),
-            // }
-            // addDoc(dataRef, logData);
-            console.log('hi ', conditionRef.current, participantRef.current)
+        const dataRef = collection(db, conditionRef.current)
+        const start_time = Timestamp.now()
+        const logData = {
+            start_time,
+            timestamp: start_time,
+            start_time_UNIX: start_time.toMillis(),
+            timestamp_UNIX: start_time.toMillis(),
+            participantId: participantRef.current,
 
-            setDoc(dataRef, {
-                start_time,
-                participantId: participantRef.current,
-                timestamp: start_time,
-                start_time_UNIX: start_time.toMillis(),
-                timestamp_UNIX: start_time.toMillis(),
-            }, { merge: true })
-            interactionTime.current = start_time.toMillis()
         }
+        addDoc(dataRef, logData);
+        console.log('hi ', conditionRef.current, participantRef.current)
+        interactionTime.current = start_time.toMillis()
     }
 
     const nextQuestion = () => {
@@ -474,17 +466,14 @@ const EyeVote = (props) => {
                     <label className='dimgray radio_op'><input type="radio" value={WEBCAMERA} name="condition" checked={condition === WEBCAMERA} onChange={(e) => {
                         setCondition(WEBCAMERA);
                         conditionRef.current = WEBCAMERA
-                        start()
                     }} /> Web camera</label> <p />
                     <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_STAND} name="condition" checked={condition === MOBILE_WITH_STAND} onChange={(e) => {
                         setCondition(MOBILE_WITH_STAND);
                         conditionRef.current = MOBILE_WITH_STAND
-                        start()
                     }} /> Mobile with fixed stand</label><p />
                     <label className='dimgray radio_op'><input type="radio" value={MOBILE_WITH_HAND} name="condition" checked={condition === MOBILE_WITH_HAND} onChange={(e) => {
                         setCondition(MOBILE_WITH_HAND);
                         conditionRef.current = MOBILE_WITH_HAND
-                        start()
                     }} /> Mobile with hand</label><p />
                     {/* <h4 className='instructions marginTop'>The study will start with a calibration.</h4> */}
 
