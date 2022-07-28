@@ -460,7 +460,7 @@ const EyeVote = (props) => {
                             value={WEBCAMERA}
                             name="condition"
                             checked={condition === WEBCAMERA}
-                            onChange={handleChangeCondition(WEBCAMERA)} />
+                            onChange={() => handleChangeCondition(WEBCAMERA)} />
                         Web camera
                     </label>
                     <p />
@@ -469,7 +469,7 @@ const EyeVote = (props) => {
                             value={MOBILE_WITH_STAND}
                             name="condition"
                             checked={condition === MOBILE_WITH_STAND}
-                            onChange={handleChangeCondition(MOBILE_WITH_STAND)} />
+                            onChange={() => handleChangeCondition(MOBILE_WITH_STAND)} />
                         Mobile with fixed stand</label>
                     <p />
                     <label className='dimgray radio_op'>
@@ -477,20 +477,16 @@ const EyeVote = (props) => {
                             value={MOBILE_WITH_HAND}
                             name="condition"
                             checked={condition === MOBILE_WITH_HAND}
-                            onChange={handleChangeCondition(MOBILE_WITH_HAND)} />
+                            onChange={() => handleChangeCondition(MOBILE_WITH_HAND)} />
                         Mobile with hand
                     </label>
                     <p />
 
                     <br />
-                    <label className='answerOne' id="answerOne"> </label>
-                    <label className='answerTwo' id="answerTwo"> </label>
-                    <label className='answerThree' id="answerThree"> </label>
+
                     <div className="boxCenter">
                         <button className='button' onClick={() => {
-                            if (condition) {
-                                nextQuestion()
-                            }
+                            nextQuestion()
                             start()
                         }}>
                             Next
@@ -510,12 +506,11 @@ const EyeVote = (props) => {
             <div className='Eyevote'>
                 <div className="descriptionBox boxCenter">
                     <h1 className='titleEyeVote'>{props.header}</h1>
-                    <label className='answerOne' id="answerOne"> </label>
-                    <label className='answerTwo' id="answerTwo"> </label>
-                    <label className='answerThree' id="answerThree"> </label>
                     {condition !== WEBCAMERA &&
                         <>
-                            <p className='question_title'>Please use your mobile to scan the QR code below to connect with the screen.</p>
+                            <p className='instructions'>Please use your mobile to scan the QR code below to connect the eye-tracker with the screen.
+                            </p>
+
                             <div className="boxCenter">
                                 <Image
                                     //   loader={myLoader}
@@ -524,25 +519,29 @@ const EyeVote = (props) => {
                                     width={300}
                                     height={300}
                                 />
-                                <p className='question_title'>Please click "Start" button on mobile if ready.</p>
                             </div>
                         </>
                     }
                     {/* < className='instructions'>Follow the circle by following its movement with your gaze.</h4> */}
-                    <p className='instructions'>Find and follow the <span className='pink'>PINK</span> potato moving on the screen</p>
-                    <Image
-                        src={'/pink_cute.png'}
-                        alt="Pink potato"
-                        width={600}
-                        height={250}
-                    />
+                    <p className='instructions'>Find and follow the <span className='pink'>PINK</span> potato(
+                        <Image
+                            src={'/pink_cute.png'}
+                            alt="Pink potato"
+                            width={100}
+                            height={50}
+                        />
+                        )moving on the screen</p>
 
-                    <p className='question_title dimgray'>{`Eye-tracker status: `}
+                    <div className='question_title dimgray'>{`Eye-tracker status: `}
                         <span className={eyetrackerConnected ? 'green' : 'red'}>
                             {eyetrackerConnected ? 'Connected' : 'Not Connected'}
                         </span>
-                    </p>
-                    {eyetrackerConnected && <div className="boxCenter">
+                    </div>
+
+                    {condition !== WEBCAMERA &&
+                        <p className='question_title'>Please click "Start" button on mobile if ready.</p>
+                    }
+                    {(eyetrackerConnected && condition === WEBCAMERA) && <div className="boxCenter">
                         <button className='eyevotebutton marginTop' onClick={() => {
                             nextQuestion(); calibrationDone.current = true;
                         }}>
