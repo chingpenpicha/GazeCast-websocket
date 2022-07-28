@@ -136,7 +136,7 @@ const MobileEyeTrack = () => {
             {(question >= 0 && question <= 6) && <>
                 <p>{`Current question : ${question}`}</p>
                 <div>
-                    Find the <span className='pink'>PINK</span> potato!
+                    Follow the <span className='pink'>PINK</span> potato!
                 </div>
             </>}
             <br />

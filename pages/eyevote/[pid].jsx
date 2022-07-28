@@ -539,7 +539,7 @@ const EyeVote = () => {
 
         return (
             <div className='Eyevote'>
-                <h1 className='question' id="questionPrompt">Find the <span className='pink'>PINK</span> potato! {props.prompt}</h1>
+                <h1 className='question' id="questionPrompt">Follow the <span className='pink'>PINK</span> potato! {props.prompt}</h1>
 
                 <div className={`answerOne`} id="answerOne">
                     <Image

@@ -135,7 +135,7 @@ const Webcamera = () => {
       </>}
       {(question > 0 && question <= 6) && <div>
         <p>{`current question : ${question}`}</p>
-        Find the <span className='pink'>PINK</span> potato!
+        Follow the <span className='pink'>PINK</span> potato!
       </div>}
       <h4>{`gazeX : ${gazePosition.x}`}</h4>
       <h4>{`gazeY : ${gazePosition.y}`}</h4>
