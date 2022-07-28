@@ -255,12 +255,12 @@ ol>li:before {
 @keyframes zigzag {
     0% {
         top: 70vh;
-        left: 80vw
+        left: 75vw
     }
 
     20% {
         top: 55vh;
-        left: 70vw
+        left: 65vw
     }
 
     40% {
@@ -270,17 +270,17 @@ ol>li:before {
 
     60% {
         top: 55vh;
-        left: 44vw
+        left: 45vw
     }
 
     80% {
         top: 70vh;
-        left: 30vw
+        left: 35vw
     }
 
     100% {
         top: 55vh;
-        left: 15vw
+        left: 25vw
     }
 }
 
