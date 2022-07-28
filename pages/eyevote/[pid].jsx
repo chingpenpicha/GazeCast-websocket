@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { db } from '../../firebase';
-import { doc, collection, setDoc, addDoc, Timestamp } from "firebase/firestore";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
 
 // import the fn for correlation
 import calculateCorrelation from "calculate-correlation"
@@ -403,8 +403,9 @@ const EyeVote = (props) => {
 
                     /// clear array : TIME OUT AFTER 30 seconds
                     if (!isChangeAns && logGazeTime.length > 30) {
-                        logData = { ...logData, ...handleCorrelationIsDetected(NOT_DETECT, NaN) }
+                        logData = { ...logData, ...handleCorrelationIsDetected(NOT_DETECT, NaN, target_to_select) }
                         answerselected.current = NOT_DETECT
+                        logData.select_status = NOT_DETECT
                         isChangeAns = true
                     }
 

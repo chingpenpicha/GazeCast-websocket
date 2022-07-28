@@ -9,16 +9,12 @@ const Webcamera = () => {
 
 
   const firstRenderRef = useRef(true);
-  const [question, setQuestion] = useState(-2)
+  const [question, setQuestion] = useState(-1)
   const questionRef = useRef(-2)
   const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
   const [seesoConnected, setSeesoConnected] = useState(false)
   const [windowSize, setWindowSize] = useState({ w: 0, h: 0 })
-  const [gazeLog, setGazeLog] = useState({
-    max_x: -1000, max_y: -1000, min_x: 2000, min_y: 2000
-  })
-  let logGazeX = []
-  let logGazeY = []
+
   let gaze_x
   let gaze_y
   let TrackingState
@@ -30,7 +26,6 @@ const Webcamera = () => {
         setSeesoConnected(true)
       }
 
-      let gazeLog_temp = gazeLog
       setGazePosition({ ...gazeInfo })
       if (!gaze_x) {
         console.log("X_NAN")
@@ -47,30 +42,6 @@ const Webcamera = () => {
         socket.emit('gaze-position-change', gazeObj)
       }
 
-      if (gaze_x) {
-        logGazeX.push(gaze_x)
-      }
-      if (gaze_y) {
-        logGazeY.push(gaze_y)
-      }
-
-      if (gaze_x > gazeLog.max_x) {
-        gazeLog_temp.max_x = gaze_x
-      }
-
-      if (gaze_x < gazeLog.min_x) {
-        gazeLog_temp.min_x = gaze_x
-      }
-
-      if (gaze_y > gazeLog.max_y) {
-        gazeLog_temp.max_y = gaze_y
-      }
-
-      if (gaze_x < gazeLog.min_y) {
-        gazeLog_temp.min_y = gaze_y
-      }
-
-      setGazeLog(gazeLog_temp)
     }
   }
 
@@ -160,8 +131,7 @@ const Webcamera = () => {
       <div className='alignCenter'>
         <h1>Thank you for participating in the GazeCast experiment</h1>
         <h1>Now you can close your mobile</h1>
-        <p>X range: {gazeLog.min_x} - {gazeLog.max_x}</p>
-        <p>Y range: {gazeLog.min_y} - {gazeLog.max_y}</p>
+
       </div>
     )
   }
@@ -182,8 +152,7 @@ const Webcamera = () => {
       </div>}
       <h4>{`gazeX : ${gazePosition.x}`}</h4>
       <h4>{`gazeY : ${gazePosition.y}`}</h4>
-      <p>X range: {gazeLog.min_x} -- {gazeLog.max_x}</p>
-      <p>Y range: {gazeLog.min_y} -- {gazeLog.max_y}</p>
+
       <p>window w: {windowSize.w} </p>
       <p>window h: {windowSize.h} </p>
     </div>

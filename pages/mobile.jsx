@@ -20,8 +20,7 @@ const MobileEyeTrack = () => {
     const [gazeLog, setGazeLog] = useState({
         max_x: -1000, max_y: -1000, min_x: 2000, min_y: 2000
     })
-    let logGazeX = []
-    let logGazeY = []
+
     let gaze_x
     let gaze_y
     let TrackingState
@@ -33,7 +32,6 @@ const MobileEyeTrack = () => {
             if (!seesoConnected) {
                 setSeesoConnected(true)
             }
-            let gazeLog_temp = gazeLog
             setGazePosition({ ...gazeInfo })
 
             gaze_x = gazeInfo.x
@@ -45,42 +43,8 @@ const MobileEyeTrack = () => {
             if (questionRef.current > -1) {
                 socket.emit('gaze-position-change', gazeObj)
             }
-            // logGazeX = []
-            // logGazeY = []
-            // setGazeLog(gazeLog_temp)
-
 
         }
-        // if (!gaze_x) {
-        //     console.log("X_NAN")
-        // }
-        // if (!gaze_y) {
-        //     console.log("Y_NAN")
-        // }
-
-        // if (gaze_x) {
-        //     logGazeX.push(new_gaze_x)
-        // }
-        // if (gaze_y) {
-        //     logGazeY.push(new_gaze_y)
-        // }
-
-        // if (gaze_x > gazeLog.max_x) {
-        //     gazeLog_temp.max_x = gaze_x
-        // }
-
-        // if (gaze_x < gazeLog.min_x) {
-        //     gazeLog_temp.min_x = gaze_x
-        // }
-
-        // if (gaze_y > gazeLog.max_y) {
-        //     gazeLog_temp.max_y = gaze_y
-        // }
-
-        // if (gaze_x < gazeLog.min_y) {
-        //     gazeLog_temp.min_y = gaze_y
-        // }
-
     }
 
     // debug callback.
@@ -139,8 +103,6 @@ const MobileEyeTrack = () => {
                 // seeSo.setMonitorSize(32);
                 seeSo.setFaceDistance(25);
                 seeSo.setCameraPosition(window.outerWidth / 2, true);
-                // console.log('w: ', window.outerWidth)
-                // console.log('h: ', window.outerHeight)
                 seeSo.startTracking(onGaze, onDebug)
             }, () => { alert('init SeeSo failed') })
         }
