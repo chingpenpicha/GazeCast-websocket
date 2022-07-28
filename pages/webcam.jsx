@@ -78,6 +78,10 @@ const Webcamera = () => {
     // console.log('BUG', FPS, latency_min, latency_max, latency_avg)
   }
 
+  const sendNext = () => {
+    socket.emit('click-next-question', question)
+  }
+
   useEffect(() => {
     // for dev
     // protect double call 
