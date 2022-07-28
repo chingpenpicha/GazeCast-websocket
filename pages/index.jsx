@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 const Home = () => {
@@ -26,21 +27,42 @@ const Home = () => {
                 <input type="text" pid="pid" value={pid} onChange={(e) => setPid(e.target.value)} />
                 <p style={{ color: 'red' }}>{idErr}</p>
             </div>
-            <p className="body">First of all, thank you for your interest in my Master Thesis study “GazeCast: Using mobile for eye tracking on public display by Pursuit”.</p>
+            <p className="body">First of all, thank you for your interest in my Master Thesis study “GazeCast: Using a mobile device to eye-track gaze interaction on the public display”.</p>
             <p className="body">The purpose of this experiment is to evaluate the effectiveness of an eye-tracker provided by a smartphone camera to that of a standard web camera. </p>
             <p className="body">This study will take approximately 30 minutes.</p>
-            <p className="body">Once the study starts, there will be three primary sections to this study. The task you must complete is to follow the white circle on the screen with your eyes using a different sort of eye-tracker for each section.
-                To be clear, run three tests: one with a camera, one with a phone on a stand, and one with a phone in your hand. I'll record your time spent on the study as well as any screen-based gaze data.</p>
+            <p className="body">
+                The task you must complete is to follow the pink potato on the screen with your eyes, using a different sort of eye-tracker for each
+                section.
+            </p>
+            <div className="body">
+                <Image
+                    src="/interface_eg.png"
+                    alt="QR code to mobile eye tracker"
+                    width={600}
+                    height={300}
+                />
+            </div>
+            <p className="body">
+                There will be three primary sections to this study: one with a camera, one with a phone on a stand, and
+                one with a phone in your hand.
+            </p>
+            <p className="body">
+                I'll record your time spent on the study as well as any screen-based gaze data. All participant
+                data will be stored securely and in an anonymous form.
+            </p>
+            <p className="body">
+                Before starting each task, you will have a training task to learn how to interact with the
+                display. Then it will be followed by six more tasks. You will be asked to complete
+                the questionnaire after completing each section.
+            </p>
 
             <div className="body">
+                NOTE*
                 <ol className='body' style={{ listStyleType: "decimal" }}>
                     <li>If you have any questions, please ask.</li>
-                    <li>After completing each test, Each section will include a questionnaire that you must complete.</li>
                     <li>Stay relaxed and remember that the eye-tracker, not you, is being evaluated.</li>
-                    <li>You can brink your eyes or request a break after each section if you like.</li>
                 </ol>
             </div>
-            <p className="body">After clicking "Continue", you will be led to the Consent Form first.</p>
             <button onClick={handleNextPage} className="start-button">Continue</button>
         </div>
     );
