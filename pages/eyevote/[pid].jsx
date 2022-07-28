@@ -261,10 +261,19 @@ const EyeVote = (props) => {
         // add start timestamp
         if (condition && pid) {
             const dataRef = doc(db, conditionRef.current, participantRef.current)
-            console.log('hi ', conditionRef.current, participantRef.current)
             const start_time = Timestamp.now()
+            // const logData = {
+            //     start_time,
+            //     timestamp: start_time,
+            //     start_time_UNIX: start_time.toMillis(),
+            //     timestamp_UNIX: start_time.toMillis(),
+            // }
+            // addDoc(dataRef, logData);
+            console.log('hi ', conditionRef.current, participantRef.current)
+
             setDoc(dataRef, {
                 start_time,
+                participantId: participantRef.current,
                 timestamp: start_time,
                 start_time_UNIX: start_time.toMillis(),
                 timestamp_UNIX: start_time.toMillis(),
@@ -478,36 +487,23 @@ const EyeVote = (props) => {
                         start()
                     }} /> Mobile with hand</label><p />
                     {/* <h4 className='instructions marginTop'>The study will start with a calibration.</h4> */}
-                    {condition !== WEBCAMERA &&
-                        <>
-                            <p className='question_title'>Please use your mobile to scan the QR code below to connect with the screen.</p>
-                            <div className="boxCenter">
-                                <Image
-                                    //   loader={myLoader}
-                                    src="/qrcode.png"
-                                    alt="QR code to mobile eye tracker"
-                                    width={300}
-                                    height={300}
-                                />
-                                <p className='question_title'>Please click "NEXT" button on mobile if ready.</p>
-                            </div>
-                        </>
-                    }
+
                     <br />
                     <label className='answerOne' id="answerOne"> </label>
                     <label className='answerTwo' id="answerTwo"> </label>
                     <label className='answerThree' id="answerThree"> </label>
-                    {condition === WEBCAMERA && <div className="boxCenter">
+                    <div className="boxCenter">
                         <button className='button' onClick={() => {
                             if (condition) {
                                 nextQuestion()
                             }
+                            start()
                         }}>
                             Next
                         </button>
 
                     </div>
-                    }
+
 
                 </div >
             </div >
@@ -523,6 +519,21 @@ const EyeVote = (props) => {
                     <label className='answerOne' id="answerOne"> </label>
                     <label className='answerTwo' id="answerTwo"> </label>
                     <label className='answerThree' id="answerThree"> </label>
+                    {condition !== WEBCAMERA &&
+                        <>
+                            <p className='question_title'>Please use your mobile to scan the QR code below to connect with the screen.</p>
+                            <div className="boxCenter">
+                                <Image
+                                    //   loader={myLoader}
+                                    src="/qrcode.png"
+                                    alt="QR code to mobile eye tracker"
+                                    width={300}
+                                    height={300}
+                                />
+                                <p className='question_title'>Please click "Start" button on mobile if ready.</p>
+                            </div>
+                        </>
+                    }
                     {/* < className='instructions'>Follow the circle by following its movement with your gaze.</h4> */}
                     <p className='instructions'>Find and follow the <span className='pink'>PINK</span> potato moving on the screen</p>
                     <Image

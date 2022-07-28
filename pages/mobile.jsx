@@ -11,7 +11,7 @@ const SCREEN_HEIGHT = 1001
 
 const MobileEyeTrack = () => {
     const firstRenderRef = useRef(true);
-    const [question, setQuestion] = useState(-2)
+    const [question, setQuestion] = useState(-1)
     const questionRef = useRef(-2)
 
     const [seesoConnected, setSeesoConnected] = useState(false)
