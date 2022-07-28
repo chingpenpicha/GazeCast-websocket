@@ -224,10 +224,11 @@ const EyeVote = (props) => {
         setUndo('1')
         setTimeout(function () {
             //console.log("Timeout over")
-            empty()
             undoscreen.current = false
             setUndo(0)
             nextQuestion()
+            empty()
+
         }, 5000);
     }
 
@@ -290,7 +291,6 @@ const EyeVote = (props) => {
         if ((!undoscreen.current) && question.current >= 0 && logGazePosition_x.length >= SIZE_OF_ARR) {
             //check change ans
             let isChangeAns = false
-            console.log(logGazePosition_x.length, logLabelPositionOne_x.length)
 
             logGazeTime.push(Timestamp.now())
 
@@ -318,6 +318,8 @@ const EyeVote = (props) => {
             if (logGazePosition_y.length > SIZE_OF_ARR) {
                 logGazePosition_y = logGazePosition_y.slice(logGazePosition_y.length - SIZE_OF_ARR)
             }
+
+            console.log(logGazePosition_x.length, logLabelPositionOne_x.length)
 
             if (logGazePosition_x.length === SIZE_OF_ARR && logLabelPositionOne_x.length === SIZE_OF_ARR) {
                 // calculate the correlation

@@ -12,6 +12,8 @@ const SCREEN_HEIGHT = 1001
 const MobileEyeTrack = () => {
     const firstRenderRef = useRef(true);
     const [question, setQuestion] = useState(-2)
+    const questionRef = useRef(-2)
+
     const [seesoConnected, setSeesoConnected] = useState(false)
     const [windowSize, setWindowSize] = useState({ w: 0, h: 0 })
     const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
@@ -39,10 +41,12 @@ const MobileEyeTrack = () => {
             let new_gaze_x = gaze_x * SCREEN_WIDTH / window.innerWidth
             let new_gaze_y = gaze_y * SCREEN_HEIGHT / window.innerHeight
 
-            const gazeObj = { gaze_x: new_gaze_x, gaze_y: new_gaze_y, page: 'mobile' }
+            const gazeObj = { gaze_x: new_gaze_x, gaze_y: new_gaze_y }
+            if (questionRef.current > -1) {
+                socket.emit('gaze-position-change', gazeObj)
+            }
             // logGazeX = []
             // logGazeY = []
-            socket.emit('gaze-position-change', gazeObj)
             // setGazeLog(gazeLog_temp)
 
 
@@ -109,6 +113,8 @@ const MobileEyeTrack = () => {
 
                 socket.on('update-question', msg => {
                     setQuestion(msg)
+                    questionRef.current = msg
+
                 })
             }
         }
@@ -190,8 +196,6 @@ const MobileEyeTrack = () => {
             <br />
             <h4>{`gazeX : ${gazePosition.x}`}</h4>
             <h4>{`gazeY : ${gazePosition.y}`}</h4>
-            <p>X range: {gazeLog.min_x} - {gazeLog.max_x}</p>
-            <p>Y range: {gazeLog.min_y} - {gazeLog.max_y}</p>
 
             <p>window w: {windowSize.w} </p>
             <p>window h: {windowSize.h} </p>

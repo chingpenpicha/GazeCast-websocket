@@ -9,7 +9,8 @@ const Webcamera = () => {
 
 
   const firstRenderRef = useRef(true);
-  const [question, setQuestion] = useState(-1)
+  const [question, setQuestion] = useState(-2)
+  const questionRef = useRef(-2)
   const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
   const [seesoConnected, setSeesoConnected] = useState(false)
   const [windowSize, setWindowSize] = useState({ w: 0, h: 0 })
@@ -40,9 +41,11 @@ const Webcamera = () => {
 
       gaze_x = gazeInfo.x
       gaze_y = gazeInfo.y
-      const gazeObj = { gaze_x, gaze_y, page: 'webcam' }
+      const gazeObj = { gaze_x, gaze_y }
 
-      socket.emit('gaze-position-change', gazeObj)
+      if (questionRef.current > -1) {
+        socket.emit('gaze-position-change', gazeObj)
+      }
 
       if (gaze_x) {
         logGazeX.push(gaze_x)
@@ -101,6 +104,7 @@ const Webcamera = () => {
 
         socket.on('update-question', msg => {
           setQuestion(msg)
+          questionRef.current = msg
         })
       }
     }
