@@ -64,7 +64,7 @@ const EyeVote = () => {
 
     // set condition of the experiment
     const conditionRef = useRef('')
-    const [condition, setCondition] = useState(WEBCAMERA)
+    const [condition, setCondition] = useState("")
 
     const router = useRouter()
     const pid = router.query.pid || ''
