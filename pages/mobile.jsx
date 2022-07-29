@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
+import { getFaceStatus } from '../constant'
+
 import io from 'socket.io-client'
 
 const licenseKey = process.env.SEESO_KEY
@@ -14,6 +16,7 @@ const MobileEyeTrack = () => {
     const questionRef = useRef(-2)
 
     const [seesoConnected, setSeesoConnected] = useState(false)
+    const [trackStatus, setTrackStatus] = useState('')
     const [windowSize, setWindowSize] = useState({ w: 0, h: 0 })
     const [gazePosition, setGazePosition] = useState({ x: 0, y: 0 })
 
@@ -25,9 +28,14 @@ const MobileEyeTrack = () => {
         // do something with gaze info.
         // console.log('gazeInfo', gazeInfo.x, gazeInfo.y)
         if (TrackingState && gazeInfo.trackingState === TrackingState.SUCCESS) {
+            if (trackStatus !== getFaceStatus(0)) {
+                setTrackStatus(getFaceStatus(gazeInfo.trackingState))
+            }
+
             if (!seesoConnected) {
                 setSeesoConnected(true)
             }
+
             setGazePosition({ ...gazeInfo })
 
             gaze_x = gazeInfo.x
@@ -41,6 +49,9 @@ const MobileEyeTrack = () => {
             if (questionRef.current > -1) {
                 socket.emit('gaze-position-change', gazeObj)
             }
+
+        } else if (TrackingState && gazeInfo.trackingState !== TrackingState.SUCCESS) {
+            setTrackStatus(getFaceStatus(gazeInfo.trackingState))
 
         }
     }
@@ -98,7 +109,7 @@ const MobileEyeTrack = () => {
             await seeSo.init(licenseKey, () => {
                 // seeSo.setMonitorSize(32);
                 seeSo.setFaceDistance(25);
-                seeSo.setCameraPosition(window.outerWidth / 2, true);
+                seeSo.setCameraPosition(window.outerWidth / 2, false);
                 seeSo.startTracking(onGaze, onDebug)
             }, () => { alert('init SeeSo failed') })
 
@@ -140,6 +151,8 @@ const MobileEyeTrack = () => {
                 </div>
             </>}
             <br />
+            <hr />
+            <h4>Tracking status : {trackStatus}</h4>
             <h4>{`gazeX : ${gazePosition.x}`}</h4>
             <h4>{`gazeY : ${gazePosition.y}`}</h4>
 

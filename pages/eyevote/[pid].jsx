@@ -462,8 +462,10 @@ const EyeVote = () => {
 
                     <div className="boxCenter">
                         <button className='button' onClick={() => {
-                            nextQuestion()
-                            start()
+                            if (condition) {
+                                nextQuestion()
+                                start()
+                            }
                         }}>
                             Next
                         </button>
