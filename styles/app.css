@@ -209,7 +209,7 @@ ol>li:before {
     color: white;
     border-radius: 3vh;
     top: 35vh;
-    left: 15vw;
+    left: 20vw;
     animation: zigzag 9s linear infinite;
     animation-direction: alternate;
 }
@@ -232,7 +232,7 @@ ol>li:before {
 
 @keyframes diagonal {
     from {
-        top: 25vh;
+        top: 30vh;
         left: 80vw
     }
 
