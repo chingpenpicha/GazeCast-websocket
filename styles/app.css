@@ -77,6 +77,15 @@
     margin-left: 1em;
 }
 
+.flex {
+    display: flex;
+    justify-content: space-between;
+}
+
+.flex>* {
+    width: 50%;
+}
+
 .App-logo {
     height: 40vmin;
     pointer-events: none;
