@@ -195,7 +195,7 @@ ol>li:before {
     color: white;
     border-radius: 3vh;
     top: 35vh;
-    left: 25vw;
+    left: 30vw;
     animation: circular 8s linear infinite;
 }
 

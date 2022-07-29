@@ -308,12 +308,10 @@ const EyeVote = () => {
 
     // calculates Correlation
     function _calculateCorrelation() {
-
+        logGazeTime.push(Timestamp.now())
         if ((!undoscreen.current) && question.current >= 0 && logGazePosition_x.length >= SIZE_OF_ARR) {
             //check change ans
             let isChangeAns = false
-
-            logGazeTime.push(Timestamp.now())
 
             if (logLabelPositionOne_x.length > SIZE_OF_ARR) {
                 logLabelPositionOne_x = logLabelPositionOne_x.slice(logLabelPositionOne_x.length - SIZE_OF_ARR)
@@ -508,7 +506,17 @@ const EyeVote = () => {
                             height={50}
                         />
                         )moving on the screen</p>
-
+                    <div>
+                        {
+                            [0, 1, 2, 3, 4, 5, 6].map(e =>
+                                <Image
+                                    src={`/pink_${e}.png`}
+                                    alt="pink img"
+                                    key={`pink_img${e}`}
+                                    height={50}
+                                    width={50}
+                                />
+                            )}</div>
                     <div className='question_title dimgray'>{`Eye-tracker status: `}
                         <span className={eyetrackerConnected ? 'green' : 'red'}>
                             {eyetrackerConnected ? 'Connected' : 'Not Connected'}

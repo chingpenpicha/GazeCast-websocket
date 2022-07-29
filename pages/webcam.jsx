@@ -58,8 +58,8 @@ const Webcamera = () => {
   useEffect(() => {
     // // uncomment to protect dev double call
     // if (firstRenderRef.current) {
-    //     firstRenderRef.current = false;
-    //     return;
+    //   firstRenderRef.current = false;
+    //   return;
     // }
 
     const socketInitializer = async () => {
