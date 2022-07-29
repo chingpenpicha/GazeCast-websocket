@@ -241,8 +241,8 @@ ol>li:before {
 
 @keyframes diagonal {
     from {
-        top: 30vh;
-        left: 80vw
+        top: 25vh;
+        left: 75vw
     }
 
     to {
