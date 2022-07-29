@@ -163,7 +163,7 @@ const EyeVote = () => {
 
     useEffect(() => {
         conditionRef.current = condition
-        participantRef.current = pid
+        participantRef.current = router.query.pid || ''
     }, [condition])
 
     const handleAnswerRecived = () => {
