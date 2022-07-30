@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    SEESO_KEY: 'dev_j1ibas14bjbydb3xe65mdk9gj42rraplrfxbmu1w',
+    SEESO_KEY: 'dev_5lnmpgqq7pkxpmw9g9f4sxzogayxoopz4bhpe8sv',
   },
   async headers() {
     return [
