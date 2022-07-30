@@ -205,7 +205,7 @@ ol>li:before {
     border-radius: 3vh;
     top: 35vh;
     left: 30vw;
-    animation: circular 7s linear infinite;
+    animation: circular 6s linear infinite;
 }
 
 .answerTwo {
